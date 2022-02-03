@@ -1,0 +1,12 @@
+{
+  "name": "Panel corners",
+  "description": "Keep the old topbar corners, removed for GNOME 42",
+  "uuid": "panel-corners@aunetx",
+  "shell-version": [
+    "41"
+  ],
+  "version": 1,
+  "session-modes": [
+    "user"
+  ]
+}
