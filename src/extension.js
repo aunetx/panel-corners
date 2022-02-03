@@ -2,12 +2,15 @@
 
 const { St, GObject } = imports.gi;
 const Main = imports.ui.main;
+const Config = imports.misc.config;
 
 const Me = imports.misc.extensionUtils.getCurrentExtension();
 const { PanelCorner } = Me.imports.panel_corner;
+const { Connections } = Me.imports.connections;
 const { Prefs, Keys } = Me.imports.settings;
 
 const SYNC_CREATE = GObject.BindingFlags.SYNC_CREATE;
+const [GS_MAJOR, GS_MINOR] = Config.PACKAGE_VERSION.split('.');
 
 
 class Extension {
@@ -15,12 +18,18 @@ class Extension {
     }
 
     enable() {
+        this._prefs = new Prefs;
+        this._connections = new Connections;
+
         this._log("starting up...");
 
-        this._prefs = new Prefs;
+        if (GS_MAJOR < 42) {
+            this._old_corners = [Main.panel._leftCorner, Main.panel._rightCorner];
+        }
 
         if (Main.layoutManager._startingUp)
-            this.startup_complete_id = Main.layoutManager.connect(
+            this._connections.connect(
+                Main.layoutManager,
                 'startup-complete',
                 this.update.bind(this)
             );
@@ -33,56 +42,83 @@ class Extension {
 
         let panel = Main.panel;
 
+        // diconnect old settings signals
+        this._connections.disconnect_all_for(this._prefs.settings);
+
         // remove already existing corners
+        this.remove();
 
-        if (panel._leftCorner)
-            panel.remove_child(panel._leftCorner);
-        if (panel._rightCorner)
-            panel.remove_child(panel._rightCorner);
-        if (this._settings_changed_id_left)
-
-
-            // create each corner
-
-            panel._leftCorner = new PanelCorner(St.Side.LEFT, this._prefs);
+        // create each corner
+        panel._leftCorner = new PanelCorner(St.Side.LEFT, this._prefs);
         panel._rightCorner = new PanelCorner(St.Side.RIGHT, this._prefs);
 
         // bind their style to the panel style
-
         panel.bind_property('style', panel._leftCorner, 'style', SYNC_CREATE);
         panel.bind_property('style', panel._rightCorner, 'style', SYNC_CREATE);
 
         // add corners to the panel, showing them
-
         panel.add_child(panel._leftCorner);
         panel.add_child(panel._rightCorner);
 
-        // connect to the preference changes
 
+        // connect to the preference changes
         Keys.forEach(key => {
-            this._prefs.get_key(key).changed(_ => {
-                this._settings_changed_id_left = panel._leftCorner.vfunc_style_changed();
-                this._settings_changed_id_right = panel._rightCorner.vfunc_style_changed();
-            });
+            this._connections.connect(
+                this._prefs.settings,
+                'changed::' + key.name,
+                _ => {
+                    panel._leftCorner.vfunc_style_changed();
+                    panel._rightCorner.vfunc_style_changed();
+                }
+            );
         });
     }
 
+    remove() {
+        let panel = Main.panel;
+
+        if (panel._leftCorner) {
+            // remove from panel
+            panel.remove_child(panel._leftCorner);
+            // disconnect extension's signals
+            this._connections.disconnect_all_for(panel._leftCorner);
+            // if not original corners (which we want to restore later), destroy
+            if (this._old_corners && !this._old_corners.includes(panel._leftCorner))
+                panel._leftCorner.destroy();
+            // remove from panel class
+            delete panel._leftCorner;
+        }
+
+        // all the same
+        if (panel._rightCorner) {
+            panel.remove_child(panel._rightCorner);
+            this._connections.disconnect_all_for(panel._rightCorner);
+            if (this._old_corners && !this._old_corners.includes(panel._rightCorner))
+                panel._rightCorner.destroy();
+            delete panel._rightCorner;
+        }
+    }
+
     disable() {
-        if (this.startup_complete_id)
-            Main.layoutManager.disconnect(this.startup_complete_id);
+        this._connections.disconnect_all();
+        this.remove();
 
         let panel = Main.panel;
 
-        panel.remove_child(panel._leftCorner);
-        panel.remove_child(panel._rightCorner);
-        panel._leftCorner.destroy();
-        panel._rightCorner.destroy();
-        delete panel._leftCorner;
-        delete panel._rightCorner;
+        // if using GNOME < 42, restore default corners
+        if (this._old_corners) {
+            [panel._leftCorner, panel._rightCorner] = this._old_corners;
+
+            panel.add_child(panel._leftCorner);
+            panel.add_child(panel._rightCorner);
+        }
+
+        this._log("extension disabled.");
     }
 
     _log(str) {
-        log(`[Panel corners] ${str}`);
+        if (this._prefs.DEBUG.get())
+            log(`[Panel corners] ${str}`);
     }
 }
 

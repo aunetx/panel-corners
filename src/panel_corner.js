@@ -125,36 +125,46 @@ var PanelCorner = GObject.registerClass(
         }
 
         _lookup_for(node, prop, kind) {
-            let lookup;
-            switch (kind) {
-                case ValueType.Lenght:
-                    lookup = node.lookup_length(prop, false);
-                    break;
-                case ValueType.Color:
-                    lookup = node.lookup_color(prop, false);
-                    break;
-                case ValueType.Double:
-                    lookup = node.lookup_double(prop, false);
-                    break;
-            }
+            const use_extension_values = this._prefs.FORCE_EXTENSION_VALUES.get();
 
-            let value;
-            if (!lookup[0]) {
-                value = lookup[1];
-                this._log(`found prop in theme node: ${prop} = ${value}`);
-            } else {
-                if (kind == ValueType.Color) {
-                    // TODO verify that the color exists
-                    let res = this._prefs.get_prop(prop).get();
-                    value = Clutter.color_from_string(res)[1];
-                } else {
-                    value = this._prefs.get_prop(prop).get();
+            if (!use_extension_values) {
+                let lookup;
+                switch (kind) {
+                    case ValueType.Lenght:
+                        lookup = node.lookup_length(prop, false);
+                        break;
+                    case ValueType.Color:
+                        lookup = node.lookup_color(prop, false);
+                        break;
+                    case ValueType.Double:
+                        lookup = node.lookup_double(prop, false);
+                        break;
                 }
 
-                this._log(`prop not found in theme node: ${prop} = ${value}`);
+                if (lookup[0]) {
+                    return lookup[1];
+                } else {
+                    this._log(`prop ${prop} not found in theme node`);
+                }
             }
 
-            return value;
+            if (kind == ValueType.Color) {
+                let color = this._prefs.get_prop(prop).get();
+                return this._parse_color_from(color);
+            } else {
+                return this._prefs.get_prop(prop).get();
+            }
+        }
+
+        _parse_color_from(color) {
+            let color_parsed = Clutter.color_from_string(color);
+            if (color_parsed[0]) {
+                return color_parsed[1];
+            } else {
+                this._log(`could not parse color ${color_string}, defaulting to black`);
+                this._prefs.get_prop(prop).set('#000000ff');
+                return Clutter.color_from_string('#000000ff')[1];
+            }
         }
 
         vfunc_repaint() {
@@ -210,7 +220,8 @@ var PanelCorner = GObject.registerClass(
         }
 
         _log(str) {
-            log(`[Panel corners] ${str}`);
+            if (this._prefs.DEBUG.get())
+                log(`[Panel corners] ${str}`);
         }
     }
 );

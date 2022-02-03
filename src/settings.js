@@ -14,6 +14,7 @@ const Type = {
 
 // Each key name can only be made of lowercase characters and "-"
 const Keys = [
+    { type: Type.B, name: "force-extension-values" },
     { type: Type.I, name: "panel-corner-radius" },
     { type: Type.I, name: "panel-corner-border-width" },
     { type: Type.S, name: "panel-corner-background-color" },
@@ -143,11 +144,6 @@ var Prefs = class Prefs {
     /// The prop should exist for the extension.
     get_prop(name) {
         let accessible_name = name.slice(1).replaceAll('-', '_').toUpperCase();
-        return this[accessible_name];
-    }
-
-    get_key(key) {
-        let accessible_name = key.name.replaceAll('-', '_').toUpperCase();
         return this[accessible_name];
     }
 

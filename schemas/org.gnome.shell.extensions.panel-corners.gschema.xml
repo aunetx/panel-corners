@@ -2,6 +2,13 @@
 <schemalist>
     <schema id="org.gnome.shell.extensions.panel-corners" path="/org/gnome/shell/extensions/panel-corners/">
 
+        <!-- FORCE EXTENSION VALUES -->
+        <key type="b" name="force-extension-values">
+            <default>false</default>
+            <summary>Boolean, set to true to force using extension values; otherwise themes may overwrite it</summary>
+            <description />
+        </key>
+
         <!-- CORNER RADIUS -->
         <key type="i" name="panel-corner-radius">
             <default>18</default>
