@@ -6,10 +6,17 @@ const Cairo = imports.cairo;
 
 const Me = imports.misc.extensionUtils.getCurrentExtension();
 
+const ValueType = {
+    Lenght: 'Lenght',
+    Color: 'Color',
+    Double: 'Double'
+};
+
 var PanelCorner = GObject.registerClass(
     class PanelCorner extends St.DrawingArea {
-        _init(side) {
+        _init(side, prefs) {
             this._side = side;
+            this._prefs = prefs;
 
             super._init({ style_class: 'panel-corner' });
         }
@@ -117,13 +124,46 @@ var PanelCorner = GObject.registerClass(
             }
         }
 
+        _lookup_for(node, prop, kind) {
+            let lookup;
+            switch (kind) {
+                case ValueType.Lenght:
+                    lookup = node.lookup_length(prop, false);
+                    break;
+                case ValueType.Color:
+                    lookup = node.lookup_color(prop, false);
+                    break;
+                case ValueType.Double:
+                    lookup = node.lookup_double(prop, false);
+                    break;
+            }
+
+            let value;
+            if (!lookup[0]) {
+                value = lookup[1];
+                this._log(`found prop in theme node: ${prop} = ${value}`);
+            } else {
+                if (kind == ValueType.Color) {
+                    // TODO verify that the color exists
+                    let res = this._prefs.get_prop(prop).get();
+                    value = Clutter.color_from_string(res)[1];
+                } else {
+                    value = this._prefs.get_prop(prop).get();
+                }
+
+                this._log(`prop not found in theme node: ${prop} = ${value}`);
+            }
+
+            return value;
+        }
+
         vfunc_repaint() {
             let node = this.get_theme_node();
 
-            let cornerRadius = node.get_length("-panel-corner-radius");
-            let borderWidth = node.get_length('-panel-corner-border-width');
+            let cornerRadius = this._lookup_for(node, '-panel-corner-radius', ValueType.Lenght);
+            let borderWidth = this._lookup_for(node, '-panel-corner-border-width', ValueType.Lenght);
 
-            let backgroundColor = node.get_color('-panel-corner-background-color');
+            let backgroundColor = this._lookup_for(node, '-panel-corner-background-color', ValueType.Color);
 
             let cr = this.get_context();
             cr.setOperator(Cairo.Operator.SOURCE);
@@ -151,12 +191,12 @@ var PanelCorner = GObject.registerClass(
             super.vfunc_style_changed();
             let node = this.get_theme_node();
 
-            let cornerRadius = node.get_length("-panel-corner-radius");
-            let borderWidth = node.get_length('-panel-corner-border-width');
+            let cornerRadius = this._lookup_for(node, '-panel-corner-radius', ValueType.Lenght);
+            let borderWidth = this._lookup_for(node, '-panel-corner-border-width', ValueType.Lenght);
 
             const transitionDuration =
                 node.get_transition_duration() / St.Settings.get().slow_down_factor;
-            const opacity = node.get_double('-panel-corner-opacity');
+            const opacity = this._lookup_for(node, '-panel-corner-opacity', ValueType.Double);
 
             this.set_size(cornerRadius, borderWidth + cornerRadius);
             this.translation_y = -borderWidth;
@@ -170,7 +210,7 @@ var PanelCorner = GObject.registerClass(
         }
 
         _log(str) {
-            log(`[Topbar corners] ${str}`);
+            log(`[Panel corners] ${str}`);
         }
     }
 );

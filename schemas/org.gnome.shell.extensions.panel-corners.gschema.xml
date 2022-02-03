@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schemalist>
+    <schema id="org.gnome.shell.extensions.panel-corners" path="/org/gnome/shell/extensions/panel-corners/">
+
+        <!-- CORNER RADIUS -->
+        <key type="i" name="panel-corner-radius">
+            <default>18</default>
+            <summary></summary>
+            <description />
+        </key>
+
+        <!-- CORNER BORDER WIDTH -->
+        <key type="i" name="panel-corner-border-width">
+            <default>4</default>
+            <summary></summary>
+            <description />
+        </key>
+
+        <!-- CORNER BACKGROUND COLOR -->
+        <key type="s" name="panel-corner-background-color">
+            <default>"#000000ff"</default>
+            <summary></summary>
+            <description />
+        </key>
+
+        <!-- CORNER OPACITY -->
+        <key type="d" name="panel-corner-opacity">
+            <default>1</default>
+            <summary></summary>
+            <description />
+        </key>
+
+        <!-- DEBUG -->
+        <key type="b" name="debug">
+            <default>false</default>
+            <summary>Boolean, set to true to activate debug mode (more verbose journalctl logs)</summary>
+            <description />
+        </key>
+
+    </schema>
+</schemalist>

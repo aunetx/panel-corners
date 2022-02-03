@@ -7,6 +7,8 @@ EXT_DIR = $(HOME)/.local/share/gnome-shell/extensions/$(UUID)/
 build: clean
 	mkdir -p build/
 	cp -r src/* build/
+	glib-compile-schemas schemas
+	cp -r schemas build/schemas
 
 
 pkg: build
