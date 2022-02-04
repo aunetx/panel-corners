@@ -1,6 +1,7 @@
 {
   "name": "Panel corners",
   "description": "A GNOME shell extension to keep the old topbar corners, which were removed for GNOME 42. It also allows you to customize the rounded corners, even if you use GNOME 40 or 41.",
+  "url": "https://github.com/aunetx/panel-corners",
   "uuid": "panel-corners@aunetx",
   "settings-schema": "org.gnome.shell.extensions.panel-corners",
   "shell-version": [

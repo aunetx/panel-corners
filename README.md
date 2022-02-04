@@ -2,7 +2,7 @@
 
 A GNOME shell extension to keep the old topbar corners, which were removed for GNOME 42. It also allows you to customize the rounded corners, even if you use GNOME 40 or 41.
 
-- if your GNOME shell theme still supports rounded corner (which is the case for Adwaita until GNOME 42)s, then this extension will provide them.
+- if your GNOME shell theme still supports rounded corners (which is the case for Adwaita until GNOME 42), then this extension will provide them.
 - else, this extension will provide them, and manage automatically the corners settings: the radius, background-color, ... which are normally set by the theme are then managed by the extension directly.
 
 If your theme supports panel corners but you want to customize them anyway, you can set the setting `force-extension-values` to `true` (see [Customization](https://github.com/aunetx/panel-corners/edit/master/README.md#Customization)).
