@@ -206,6 +206,8 @@ var PanelCorner = GObject.registerClass(
 
             const transitionDuration =
                 node.get_transition_duration() / St.Settings.get().slow_down_factor;
+
+            // TODO smoothly remove corner in overview if using extension opacity
             const opacity = this._lookup_for(node, '-panel-corner-opacity', ValueType.Double);
 
             this.set_size(cornerRadius, borderWidth + cornerRadius);

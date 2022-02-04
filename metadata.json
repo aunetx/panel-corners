@@ -1,9 +1,11 @@
 {
   "name": "Panel corners",
-  "description": "Keep the old topbar corners, removed for GNOME 42",
+  "description": "Get and customize your panel rounded corners, including GNOME 42 and later!",
   "uuid": "panel-corners@aunetx",
   "shell-version": [
-    "41"
+    "40",
+    "41",
+    "42"
   ],
   "version": 1,
   "session-modes": [

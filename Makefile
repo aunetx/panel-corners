@@ -9,6 +9,7 @@ build: clean
 	cp -r src/* build/
 	glib-compile-schemas schemas
 	cp -r schemas build/schemas
+	cp metadata.json build/metadata.json
 
 
 pkg: build

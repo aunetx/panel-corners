@@ -23,18 +23,21 @@ class Extension {
 
         this._log("starting up...");
 
-        if (GS_MAJOR < 42) {
-            this._old_corners = [Main.panel._leftCorner, Main.panel._rightCorner];
-        }
-
         if (Main.layoutManager._startingUp)
             this._connections.connect(
                 Main.layoutManager,
                 'startup-complete',
-                this.update.bind(this)
+                this.first_update.bind(this)
             );
         else
-            this.update();
+            this.first_update();
+    }
+
+    first_update() {
+        if (GS_MAJOR < 42 && Main.panel._leftCorner && Main.panel._rightCorner) {
+            this._old_corners = [Main.panel._leftCorner, Main.panel._rightCorner];
+        }
+        this.update();
     }
 
     update() {
@@ -83,7 +86,10 @@ class Extension {
             // disconnect extension's signals
             this._connections.disconnect_all_for(panel._leftCorner);
             // if not original corners (which we want to restore later), destroy
-            if (this._old_corners && !this._old_corners.includes(panel._leftCorner))
+            if (
+                !this._old_corners ||
+                (this._old_corners && !this._old_corners.includes(panel._leftCorner))
+            )
                 panel._leftCorner.destroy();
             // remove from panel class
             delete panel._leftCorner;
@@ -93,7 +99,10 @@ class Extension {
         if (panel._rightCorner) {
             panel.remove_child(panel._rightCorner);
             this._connections.disconnect_all_for(panel._rightCorner);
-            if (this._old_corners && !this._old_corners.includes(panel._rightCorner))
+            if (
+                !this._old_corners ||
+                (this._old_corners && !this._old_corners.includes(panel._rightCorner))
+            )
                 panel._rightCorner.destroy();
             delete panel._rightCorner;
         }
@@ -109,11 +118,15 @@ class Extension {
         if (this._old_corners) {
             [panel._leftCorner, panel._rightCorner] = this._old_corners;
 
+            // TODO fix crash when replacing child due to Blur my Shell
             panel.add_child(panel._leftCorner);
             panel.add_child(panel._rightCorner);
         }
 
         this._log("extension disabled.");
+
+        delete this._connections;
+        delete this._prefs;
     }
 
     _log(str) {

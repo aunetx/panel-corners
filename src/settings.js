@@ -13,7 +13,7 @@ const Type = {
 };
 
 // Each key name can only be made of lowercase characters and "-"
-const Keys = [
+var Keys = [
     { type: Type.B, name: "force-extension-values" },
     { type: Type.I, name: "panel-corner-radius" },
     { type: Type.I, name: "panel-corner-border-width" },
