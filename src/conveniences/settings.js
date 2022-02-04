@@ -3,41 +3,39 @@
 const Gio = imports.gi.Gio;
 
 const ExtensionUtils = imports.misc.extensionUtils;
-const Extension = ExtensionUtils.getCurrentExtension();
 
-const SCHEMA_PATH = 'org.gnome.shell.extensions.panel-corners';
-
-var settings = ExtensionUtils.getSettings(SCHEMA_PATH);
-
-const Type = {
+/// An enum non-extensively describing the type of a gsettings key.
+var Type = {
     B: 'Boolean',
     I: 'Integer',
     D: 'Double',
     S: 'String'
 };
 
-
-// Each key name can only be made of lowercase characters and "-"
-var Keys = [
-    { type: Type.B, name: "force-extension-values" },
-    { type: Type.I, name: "panel-corner-radius" },
-    { type: Type.I, name: "panel-corner-border-width" },
-    { type: Type.S, name: "panel-corner-background-color" },
-    { type: Type.D, name: "panel-corner-opacity" },
-    { type: Type.B, name: "debug" },
-];
-
-
+/// An object to get and manage the gsettings preferences.
+///
+/// Should be initialized with an array of keys, for example:
+///
+/// let prefs = new Prefs([
+///     { type: Type.I, name: "panel-corner-radius" },
+///     { type: Type.B, name: "debug" }
+/// ]);
+///
+/// Each {type, name} object represents a gsettings key, which must be created
+/// in the gschemas.xml file of the extension.
 var Prefs = class Prefs {
-    constructor() {
-        Keys.forEach(key => {
-            let property_name = key.name;
-            let accessible_name = key.name.replaceAll('-', '_').toUpperCase();
+    constructor(keys) {
+        let settings = this.settings = ExtensionUtils.getSettings();
+        log(this.settings);
+        this.keys = keys;
+
+        this.keys.forEach(key => {
+            let property_name = this.get_property_name(key.name);
 
             switch (key.type) {
                 case Type.B:
-                    this[accessible_name] = {
-                        key: property_name,
+                    this[property_name] = {
+                        key: key.name,
                         get: function () {
                             return settings.get_boolean(this.key);
                         },
@@ -56,8 +54,8 @@ var Prefs = class Prefs {
                     break;
 
                 case Type.I:
-                    this[accessible_name] = {
-                        key: property_name,
+                    this[property_name] = {
+                        key: key.name,
                         get: function () {
                             return settings.get_int(this.key);
                         },
@@ -68,7 +66,7 @@ var Prefs = class Prefs {
                             return settings.connect('changed::' + this.key, cb);
                         },
                         disconnect: function () {
-                            return settings.disconnect.apply(
+                            return this.settings.disconnect.apply(
                                 settings, arguments
                             );
                         },
@@ -76,8 +74,8 @@ var Prefs = class Prefs {
                     break;
 
                 case Type.D:
-                    this[accessible_name] = {
-                        key: property_name,
+                    this[property_name] = {
+                        key: key.name,
                         get: function () {
                             return settings.get_double(this.key);
                         },
@@ -96,8 +94,8 @@ var Prefs = class Prefs {
                     break;
 
                 case Type.S:
-                    this[accessible_name] = {
-                        key: property_name,
+                    this[property_name] = {
+                        key: key.name,
                         get: function () {
                             return settings.get_string(this.key);
                         },
@@ -118,20 +116,23 @@ var Prefs = class Prefs {
         });
     }
 
-    /// Returns the extension's value associated to the given `ThemeNode` prop
-    /// For example, for '-panel-corner-radius', returns the pref
-    /// 'panel-corner-radius' (but not its value).
-    ///
-    /// The prop should exist for the extension.
-    get_prop(name) {
-        let accessible_name = name.slice(1).replaceAll('-', '_').toUpperCase();
-        return this[accessible_name];
+    /// From the gschema name, returns the name of the associated property on
+    /// the Prefs object.
+    get_property_name(name) {
+        return name.replaceAll('-', '_').toUpperCase();
     }
 
+    /// From the gschema name, returns the associated property on the Prefs
+    /// object.
+    get_property(name) {
+        return this[this.get_property_name(name)];
+    }
+
+    /// Remove all connections managed by the Prefs object, i.e. created with
+    /// `prefs.PROPERTY.changed(callback)`.
     disconnect_all_settings() {
-        Keys.forEach(key => {
-            let accessible_name = key.name.replaceAll('-', '_').toUpperCase();
-            this[accessible_name].disconnect();
+        this.keys.forEach(key => {
+            this.get_property(key.name).disconnect();
         });
     }
 };

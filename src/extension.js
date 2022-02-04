@@ -7,48 +7,76 @@ const ExtensionUtils = imports.misc.extensionUtils;
 
 const Me = ExtensionUtils.getCurrentExtension();
 
+const { Connections } = Me.imports.conveniences.connections;
+const { Prefs, Type } = Me.imports.conveniences.settings;
+
 const { PanelCorner } = Me.imports.panel_corner;
-const { Connections } = Me.imports.connections;
-const { Prefs, Keys, settings } = Me.imports.settings;
 
 const SYNC_CREATE = GObject.BindingFlags.SYNC_CREATE;
 const [GS_MAJOR, GS_MINOR] = Config.PACKAGE_VERSION.split('.');
+
+const Keys = [
+    { type: Type.B, name: "force-extension-values" },
+    { type: Type.I, name: "panel-corner-radius" },
+    { type: Type.I, name: "panel-corner-border-width" },
+    { type: Type.S, name: "panel-corner-background-color" },
+    { type: Type.D, name: "panel-corner-opacity" },
+    { type: Type.B, name: "debug" },
+];
 
 
 class Extension {
     constructor() {
     }
 
+    /// Called on extension enable.
     enable() {
-        this._prefs = new Prefs;
+        this._prefs = new Prefs(Keys);
         this._connections = new Connections;
 
         this._log("starting up...");
 
+        // load the extension when the shell has finished starting up
         if (Main.layoutManager._startingUp)
             this._connections.connect(
                 Main.layoutManager,
                 'startup-complete',
-                this.first_update.bind(this)
+                this.load.bind(this)
             );
         else
-            this.first_update();
+            this.load();
     }
 
-    first_update() {
-        if (GS_MAJOR < 42 && Main.panel._leftCorner && Main.panel._rightCorner) {
-            this._old_corners = [Main.panel._leftCorner, Main.panel._rightCorner];
+    /// Called when the shell has finished starting up.
+    ///
+    /// It saves existing corners, if any, and create our new corners.
+    load() {
+        let panel = Main.panel;
+
+        // if GNOME still supports them, and they do exist, then save existing
+        // corners to replace them on extension disable
+        if (
+            GS_MAJOR < 42 &&
+            panel._leftCorner && panel._rightCorner
+        ) {
+            this._old_corners = [panel._leftCorner, panel._rightCorner];
         }
+
+        // finally update to create our corners
         this.update();
     }
 
+    /// Updates the corners.
+    ///
+    /// This removes already existing corners (previously created by the
+    /// extension, or from the shell itself), and create new ones.
     update() {
-        this._log("corners updated");
+        this._log("updating corners...");
 
         let panel = Main.panel;
 
-        // diconnect old settings signals
-        this._connections.disconnect_all_for(settings);
+        // diconnect old settings signals, see below when it is created
+        this._connections.disconnect_all_for(this._prefs.settings);
 
         // remove already existing corners
         this.remove();
@@ -65,11 +93,11 @@ class Extension {
         panel.add_child(panel._leftCorner);
         panel.add_child(panel._rightCorner);
 
-
-        // connect to the preference changes
+        // connect to each preference change from the extension, allowing the
+        // corners to be updated when the user changes preferences.
         Keys.forEach(key => {
             this._connections.connect(
-                settings,
+                this._prefs.settings,
                 'changed::' + key.name,
                 _ => {
                     panel._leftCorner.vfunc_style_changed();
@@ -77,39 +105,46 @@ class Extension {
                 }
             );
         });
+
+        this._log("corners updated.");
     }
 
+    /// Removes existing corners.
+    ///
+    /// It is meant to destroy entirely old corners, except if they were saved
+    /// by the extension on load; in which case it keep them intact to restore
+    /// them on extension disable.
     remove() {
         let panel = Main.panel;
 
         if (panel._leftCorner) {
-            // remove from panel
-            panel.remove_child(panel._leftCorner);
-            // disconnect extension's signals
-            this._connections.disconnect_all_for(panel._leftCorner);
-            // if not original corners (which we want to restore later), destroy
-            if (
-                !this._old_corners ||
-                (this._old_corners && !this._old_corners.includes(panel._leftCorner))
-            )
-                panel._leftCorner.destroy();
-            // remove from panel class
+            this.remove_corner(panel._leftCorner);
             delete panel._leftCorner;
         }
 
-        // all the same
         if (panel._rightCorner) {
-            panel.remove_child(panel._rightCorner);
-            this._connections.disconnect_all_for(panel._rightCorner);
-            if (
-                !this._old_corners ||
-                (this._old_corners && !this._old_corners.includes(panel._rightCorner))
-            )
-                panel._rightCorner.destroy();
+            this.remove_corner(panel._rightCorner);
             delete panel._rightCorner;
         }
     }
 
+    /// Remove the given corner.
+    remove_corner(corner) {
+        // remove from panel
+        Main.panel.remove_child(corner);
+
+        // disconnect every signal created by the extension
+        this._connections.disconnect_all_for(corner);
+
+        // if not an original corner, destroy it
+        if (
+            !this._old_corners ||
+            (this._old_corners && !this._old_corners.includes(corner))
+        )
+            corner.destroy();
+    }
+
+    /// Disables the extension.
     disable() {
         this._connections.disconnect_all();
         this.remove();

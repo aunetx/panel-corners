@@ -11,14 +11,14 @@
 
         <!-- CORNER RADIUS -->
         <key type="i" name="panel-corner-radius">
-            <default>18</default>
+            <default>12</default>
             <summary></summary>
             <description />
         </key>
 
         <!-- CORNER BORDER WIDTH -->
         <key type="i" name="panel-corner-border-width">
-            <default>4</default>
+            <default>2</default>
             <summary></summary>
             <description />
         </key>

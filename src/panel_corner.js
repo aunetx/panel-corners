@@ -148,12 +148,23 @@ var PanelCorner = GObject.registerClass(
                 }
             }
 
-            if (kind == ValueType.Color) {
-                let color = this._prefs.get_prop(prop).get();
-                return this._parse_color_from(color);
-            } else {
-                return this._prefs.get_prop(prop).get();
+            let value;
+            let result = this._prefs.get_property(prop.slice(1)).get();
+            switch (kind) {
+                case ValueType.Lenght:
+                    let scale_factor =
+                        St.ThemeContext.get_for_stage(global.stage).scale_factor;
+                    value = result * scale_factor;
+                    break;
+                case ValueType.Color:
+                    value = this._parse_color_from(result);
+                    break;
+                case ValueType.Double:
+                    value = result;
+                    break;
             }
+
+            return value;
         }
 
         _parse_color_from(color) {
@@ -162,7 +173,7 @@ var PanelCorner = GObject.registerClass(
                 return color_parsed[1];
             } else {
                 this._log(`could not parse color ${color_string}, defaulting to black`);
-                this._prefs.get_prop(prop).set('#000000ff');
+                this._prefs.get_property(prop.slice(1)).set('#000000ff');
                 return Clutter.color_from_string('#000000ff')[1];
             }
         }
