@@ -1,9 +1,13 @@
 'use strict';
 
 const Gio = imports.gi.Gio;
-const Extension = imports.misc.extensionUtils.getCurrentExtension();
+
+const ExtensionUtils = imports.misc.extensionUtils;
+const Extension = ExtensionUtils.getCurrentExtension();
 
 const SCHEMA_PATH = 'org.gnome.shell.extensions.panel-corners';
+
+var settings = ExtensionUtils.getSettings(SCHEMA_PATH);
 
 const Type = {
     B: 'Boolean',
@@ -11,6 +15,7 @@ const Type = {
     D: 'Double',
     S: 'String'
 };
+
 
 // Each key name can only be made of lowercase characters and "-"
 var Keys = [
@@ -22,33 +27,9 @@ var Keys = [
     { type: Type.B, name: "debug" },
 ];
 
-function get_local_gsettings(schema_path) {
-    const GioSSS = Gio.SettingsSchemaSource;
-    let schemaDir = Extension.dir.get_child('schemas');
-    let schemaSource = GioSSS.get_default();
-
-    if (schemaDir.query_exists(null)) {
-        schemaSource = GioSSS.new_from_directory(
-            schemaDir.get_path(),
-            schemaSource,
-            false);
-    }
-
-    let schemaObj = schemaSource.lookup(schema_path, true);
-    if (!schemaObj) {
-        throw new Error(
-            `Schema ${schema_path} could not be found for extension ${Extension.metadata.uuid}`
-        );
-    }
-    return new Gio.Settings({
-        settings_schema: schemaObj
-    });
-};
 
 var Prefs = class Prefs {
     constructor() {
-        var settings = this.settings = get_local_gsettings(SCHEMA_PATH);
-
         Keys.forEach(key => {
             let property_name = key.name;
             let accessible_name = key.name.replaceAll('-', '_').toUpperCase();

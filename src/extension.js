@@ -3,11 +3,13 @@
 const { St, GObject } = imports.gi;
 const Main = imports.ui.main;
 const Config = imports.misc.config;
+const ExtensionUtils = imports.misc.extensionUtils;
 
-const Me = imports.misc.extensionUtils.getCurrentExtension();
+const Me = ExtensionUtils.getCurrentExtension();
+
 const { PanelCorner } = Me.imports.panel_corner;
 const { Connections } = Me.imports.connections;
-const { Prefs, Keys } = Me.imports.settings;
+const { Prefs, Keys, settings } = Me.imports.settings;
 
 const SYNC_CREATE = GObject.BindingFlags.SYNC_CREATE;
 const [GS_MAJOR, GS_MINOR] = Config.PACKAGE_VERSION.split('.');
@@ -46,7 +48,7 @@ class Extension {
         let panel = Main.panel;
 
         // diconnect old settings signals
-        this._connections.disconnect_all_for(this._prefs.settings);
+        this._connections.disconnect_all_for(settings);
 
         // remove already existing corners
         this.remove();
@@ -67,7 +69,7 @@ class Extension {
         // connect to the preference changes
         Keys.forEach(key => {
             this._connections.connect(
-                this._prefs.settings,
+                settings,
                 'changed::' + key.name,
                 _ => {
                     panel._leftCorner.vfunc_style_changed();
