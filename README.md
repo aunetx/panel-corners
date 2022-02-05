@@ -1,5 +1,7 @@
 # Panel corners
 
+[<img src="https://github.com/aunetx/files_utils/raw/master/get_it_on_gnome_extensions.png" height="100" align="right">](https://extensions.gnome.org/extension/4805/panel-corners/)
+
 A GNOME shell extension to keep the old topbar corners, which were removed for GNOME 42. It also allows you to customize the rounded corners, even if you use GNOME 40 or 41.
 
 - if your GNOME shell theme still supports rounded corners (which is the case for Adwaita until GNOME 42), then this extension will provide them.
@@ -14,9 +16,9 @@ The bottom corners code is directly ported from [this merge request by Alexander
 
 ## Installation
 
-The extension should be soon available on [extensions.gnome.org](extensions.gnome.org).
+The extension is available on [extensions.gnome.org](https://extensions.gnome.org/extension/4805/panel-corners/).
 
-You can install the extension locally with:
+Otherwise, you can install the extension locally with:
 
 ```sh
 make install
