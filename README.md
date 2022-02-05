@@ -54,3 +54,5 @@ Supported GNOME shell versions are:
 This extensions is licensed under GPLv3.
 
 A very big part of the code is directly ported from the [official GNOME shell repository](https://gitlab.gnome.org/GNOME/gnome-shell), so the immense majority of the work was done by various gnome contributors. All this extension does is integrate the previous code as an extension, provide some configuration options and make all of this compatible for GNOME 42 and later.
+
+The bottom corners code is directly ported from [this merge request by Alexander Mikhaylenko](https://gitlab.gnome.org/GNOME/gnome-shell/-/merge_requests/1328) to have corners everywhere.

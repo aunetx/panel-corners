@@ -5,14 +5,103 @@ const Main = imports.ui.main;
 const Cairo = imports.cairo;
 
 const Me = imports.misc.extensionUtils.getCurrentExtension();
+const Utils = Me.imports.utils;
 
-const ValueType = {
-    Lenght: 'Lenght',
-    Color: 'Color',
-    Double: 'Double'
+const SYNC_CREATE = GObject.BindingFlags.SYNC_CREATE;
+
+
+var PanelCorners = class PanelCorners {
+    constructor(prefs, connections, old_corners) {
+        this._prefs = prefs;
+        this._connections = connections;
+        this._old_corners = old_corners;
+    }
+
+    /// Updates the corners.
+    ///
+    /// This removes already existing corners (previously created by the
+    /// extension, or from the shell itself), and create new ones.
+    update() {
+        this._log("updating panel corners...");
+
+        // remove already existing corners
+        this.remove();
+
+        // create each corner
+        Main.panel._leftCorner = new PanelCorner(St.Side.LEFT, this._prefs);
+        Main.panel._rightCorner = new PanelCorner(St.Side.RIGHT, this._prefs);
+
+        // update each of them
+        this.update_corner(Main.panel._leftCorner);
+        this.update_corner(Main.panel._rightCorner);
+
+        this._log("corners updated.");
+    }
+
+    /// Updates the given corner.
+    update_corner(corner) {
+        // bind corner style to the panel style
+        Main.panel.bind_property('style', corner, 'style', SYNC_CREATE);
+
+        // add corner to the panel, showing it
+        Main.panel.add_child(corner);
+
+        // connect to each preference change from the extension, allowing the
+        // corner to be updated when the user changes preferences
+        this._prefs.keys.forEach(key => {
+            this._connections.connect(
+                this._prefs.settings,
+                'changed::' + key.name,
+                corner.vfunc_style_changed.bind(corner)
+            );
+        });
+    }
+
+    /// Removes existing corners.
+    ///
+    /// It is meant to destroy entirely old corners, except if they were saved
+    /// by the extension on load; in which case it keep them intact to restore
+    /// them on extension disable.
+    remove() {
+        // disconnect every signal created by the extension
+        this._connections.disconnect_all();
+
+        let panel = Main.panel;
+
+        // disable each corner
+
+        if (panel._leftCorner) {
+            this.remove_corner(panel._leftCorner);
+            delete panel._leftCorner;
+        }
+
+        if (panel._rightCorner) {
+            this.remove_corner(panel._rightCorner);
+            delete panel._rightCorner;
+        }
+    }
+
+    /// Removes the given corner.
+    remove_corner(corner) {
+        // remove from panel
+        Main.panel.remove_child(corner);
+
+        // if not an original corner, destroy it
+        if (
+            !this._old_corners ||
+            (this._old_corners && !this._old_corners.includes(corner))
+        )
+            corner.destroy();
+    }
+
+    _log(str) {
+        if (this._prefs.DEBUG.get())
+            log(`[Panel corners] ${str}`);
+    }
 };
 
-var PanelCorner = GObject.registerClass(
+
+const PanelCorner = GObject.registerClass(
     class PanelCorner extends St.DrawingArea {
         _init(side, prefs) {
             this._side = side;
@@ -124,67 +213,13 @@ var PanelCorner = GObject.registerClass(
             }
         }
 
-        _lookup_for(node, prop, kind) {
-            const use_extension_values = this._prefs.FORCE_EXTENSION_VALUES.get();
-
-            if (!use_extension_values) {
-                let lookup;
-                switch (kind) {
-                    case ValueType.Lenght:
-                        lookup = node.lookup_length(prop, false);
-                        break;
-                    case ValueType.Color:
-                        lookup = node.lookup_color(prop, false);
-                        break;
-                    case ValueType.Double:
-                        lookup = node.lookup_double(prop, false);
-                        break;
-                }
-
-                if (lookup[0]) {
-                    return lookup[1];
-                } else {
-                    this._log(`prop ${prop} not found in theme node`);
-                }
-            }
-
-            let value;
-            let result = this._prefs.get_property(prop.slice(1)).get();
-            switch (kind) {
-                case ValueType.Lenght:
-                    let scale_factor =
-                        St.ThemeContext.get_for_stage(global.stage).scale_factor;
-                    value = result * scale_factor;
-                    break;
-                case ValueType.Color:
-                    value = this._parse_color_from(result);
-                    break;
-                case ValueType.Double:
-                    value = result;
-                    break;
-            }
-
-            return value;
-        }
-
-        _parse_color_from(color) {
-            let color_parsed = Clutter.color_from_string(color);
-            if (color_parsed[0]) {
-                return color_parsed[1];
-            } else {
-                this._log(`could not parse color ${color_string}, defaulting to black`);
-                this._prefs.get_property(prop.slice(1)).set('#000000ff');
-                return Clutter.color_from_string('#000000ff')[1];
-            }
-        }
-
         vfunc_repaint() {
             let node = this.get_theme_node();
 
-            let cornerRadius = this._lookup_for(node, '-panel-corner-radius', ValueType.Lenght);
-            let borderWidth = this._lookup_for(node, '-panel-corner-border-width', ValueType.Lenght);
+            let cornerRadius = Utils.lookup_for_length(node, '-panel-corner-radius', this._prefs);
+            let borderWidth = Utils.lookup_for_length(node, '-panel-corner-border-width', this._prefs);
 
-            let backgroundColor = this._lookup_for(node, '-panel-corner-background-color', ValueType.Color);
+            let backgroundColor = Utils.lookup_for_color(node, '-panel-corner-background-color', this._prefs);
 
             let cr = this.get_context();
             cr.setOperator(Cairo.Operator.SOURCE);
@@ -212,14 +247,20 @@ var PanelCorner = GObject.registerClass(
             super.vfunc_style_changed();
             let node = this.get_theme_node();
 
-            let cornerRadius = this._lookup_for(node, '-panel-corner-radius', ValueType.Lenght);
-            let borderWidth = this._lookup_for(node, '-panel-corner-border-width', ValueType.Lenght);
+            let cornerRadius = Utils.lookup_for_length(node, '-panel-corner-radius', this._prefs);
+            let borderWidth = Utils.lookup_for_length(node, '-panel-corner-border-width', this._prefs);
 
             const transitionDuration =
                 node.get_transition_duration() / St.Settings.get().slow_down_factor;
 
-            // TODO smoothly remove corner in overview if using extension opacity
-            const opacity = this._lookup_for(node, '-panel-corner-opacity', ValueType.Double);
+            let opacity = Utils.lookup_for_double(node, '-panel-corner-opacity', this._prefs);
+
+            // if using extension values and in overview, set transparent
+            if (
+                this._prefs.FORCE_EXTENSION_VALUES.get() &&
+                Main.panel.get_style_pseudo_class().includes('overview')
+            )
+                opacity = 0.;
 
             this.set_size(cornerRadius, borderWidth + cornerRadius);
             this.translation_y = -borderWidth;
