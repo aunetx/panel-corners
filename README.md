@@ -7,6 +7,11 @@ A GNOME shell extension to keep the old topbar corners, which were removed for G
 
 If your theme supports panel corners but you want to customize them anyway, you can set the setting `force-extension-values` to `true` (see [Customization](https://github.com/aunetx/panel-corners/edit/master/README.md#Customization)).
 
+
+A very big part of the code is directly ported from the [official GNOME shell repository](https://gitlab.gnome.org/GNOME/gnome-shell), so the immense majority of the work was done by various gnome contributors. All this extension does is integrate the previous code as an extension, provide some configuration options and make all of this compatible for GNOME 42 and later.
+
+The bottom corners code is directly ported from [this merge request by Alexander Mikhaylenko](https://gitlab.gnome.org/GNOME/gnome-shell/-/merge_requests/1328) to have roundness on every corner of every screen.
+
 ## Installation
 
 The extension should be soon available on [extensions.gnome.org](extensions.gnome.org).
@@ -49,10 +54,6 @@ Supported GNOME shell versions are:
 - GNOME shell 41
 - GNOME shell 40
 
-## License and mentions
+## License
 
 This extensions is licensed under GPLv3.
-
-A very big part of the code is directly ported from the [official GNOME shell repository](https://gitlab.gnome.org/GNOME/gnome-shell), so the immense majority of the work was done by various gnome contributors. All this extension does is integrate the previous code as an extension, provide some configuration options and make all of this compatible for GNOME 42 and later.
-
-The bottom corners code is directly ported from [this merge request by Alexander Mikhaylenko](https://gitlab.gnome.org/GNOME/gnome-shell/-/merge_requests/1328) to have corners everywhere.
