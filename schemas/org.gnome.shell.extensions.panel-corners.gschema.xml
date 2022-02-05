@@ -5,35 +5,42 @@
         <!-- FORCE EXTENSION VALUES -->
         <key type="b" name="force-extension-values">
             <default>false</default>
-            <summary>Boolean, set to true to force using extension values; otherwise themes may overwrite it</summary>
+            <summary>Whether or not to force using extension values; otherwise themes may overwrite it</summary>
+            <description />
+        </key>
+
+        <!-- SCREEN CORNERS -->
+        <key type="b" name="screen-corners">
+            <default>true</default>
+            <summary>Whether or not to have rounded corners on the bottom of the screen and on other monitors</summary>
             <description />
         </key>
 
         <!-- CORNER RADIUS -->
         <key type="i" name="panel-corner-radius">
             <default>12</default>
-            <summary></summary>
+            <summary>Radius of the rounded corners</summary>
             <description />
         </key>
 
         <!-- CORNER BORDER WIDTH -->
         <key type="i" name="panel-corner-border-width">
             <default>2</default>
-            <summary></summary>
+            <summary>Additionnal width used for the corner</summary>
             <description />
         </key>
 
         <!-- CORNER BACKGROUND COLOR -->
         <key type="s" name="panel-corner-background-color">
             <default>"#000000ff"</default>
-            <summary></summary>
+            <summary>Background color of the panel, must be a CSS text-color</summary>
             <description />
         </key>
 
         <!-- CORNER OPACITY -->
         <key type="d" name="panel-corner-opacity">
             <default>1</default>
-            <summary></summary>
+            <summary>Opacity of the corner when not in overview</summary>
             <description />
         </key>
 

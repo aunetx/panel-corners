@@ -17,6 +17,7 @@ const [GS_MAJOR, GS_MINOR] = Config.PACKAGE_VERSION.split('.');
 
 const Keys = [
     { type: Type.B, name: "force-extension-values" },
+    { type: Type.B, name: "screen-corners" },
     { type: Type.I, name: "panel-corner-radius" },
     { type: Type.I, name: "panel-corner-border-width" },
     { type: Type.S, name: "panel-corner-background-color" },
@@ -51,7 +52,6 @@ class Extension {
     /// It saves existing corners, if any, and create our new corners.
     load() {
         let panel = Main.panel;
-        Main.layoutManager._screenCorners = [];
 
         // if GNOME still supports them, and they do exist, then save existing
         // corners to replace them on extension disable
@@ -69,13 +69,34 @@ class Extension {
             this._prefs, new Connections, this._old_corners
         );
 
-        // create the screen corners manager
-        this._screen_corners = new ScreenCorners(
-            this._prefs, new Connections, this._old_corners
-        );
+        // create the screen corners manager needed
+        this.create_screen_corners();
+
+        // create and update the screen corners manager if the preference is
+        // changed
+        this._prefs.SCREEN_CORNERS.changed(_ => {
+            this.create_screen_corners();
+            this.update();
+        });
 
         // finally update our corners
         this.update();
+    }
+
+    /// Creates the screen corners manager if needed.
+    ///
+    /// If screen corners are deactivated, the existing corners are destroyed.
+    create_screen_corners() {
+        if (this._screen_corners) {
+            this._screen_corners.remove();
+            delete this._screen_corners;
+        }
+
+        if (this._prefs.SCREEN_CORNERS.get()) {
+            this._screen_corners = new ScreenCorners(
+                this._prefs, new Connections, this._old_corners
+            );
+        }
     }
 
     /// Updates the corners.
@@ -83,7 +104,8 @@ class Extension {
         this._log("updating corners...");
 
         this._panel_corners.update();
-        this._screen_corners.update();
+        if (this._screen_corners)
+            this._screen_corners.update();
 
         this._log("corners updated.");
     }
@@ -95,7 +117,8 @@ class Extension {
     /// them on extension disable.
     remove() {
         this._panel_corners.remove();
-        this._screen_corners.remove();
+        if (this._screen_corners)
+            this._screen_corners.remove();
     }
 
     /// Disables the extension.
@@ -118,7 +141,8 @@ class Extension {
         this._log("extension disabled.");
 
         delete this._panel_corners;
-        delete this._screen_corners;
+        if (this._screen_corners)
+            delete this._screen_corners;
         delete this._connections;
         delete this._prefs;
     }
