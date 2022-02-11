@@ -8,11 +8,9 @@ const Layout = imports.ui.layout;
 const Me = imports.misc.extensionUtils.getCurrentExtension();
 const Utils = Me.imports.utils;
 
-const CornersBottom = [
+const CornersList = [
+    Meta.DisplayCorner.TOPLEFT, Meta.DisplayCorner.TOPRIGHT,
     Meta.DisplayCorner.BOTTOMLEFT, Meta.DisplayCorner.BOTTOMRIGHT
-];
-const CornersTop = [
-    Meta.DisplayCorner.TOPLEFT, Meta.DisplayCorner.TOPRIGHT
 ];
 
 
@@ -35,14 +33,7 @@ var ScreenCorners = class ScreenCorners {
 
         // build new corners
         for (let monitor of layoutManager.monitors) {
-            let corners_list;
-
-            if (monitor == layoutManager.primaryMonitor)
-                corners_list = CornersBottom;
-            else
-                corners_list = CornersTop + CornersBottom;
-
-            for (let corner of corners_list) {
+            for (let corner of CornersList) {
                 // create the new corner actor
                 var actor = new ScreenCorner(corner, monitor, this._prefs);
 
@@ -77,8 +68,10 @@ var ScreenCorners = class ScreenCorners {
         // destroy old corners if they exist
         if (layoutManager._screenCorners)
             layoutManager._screenCorners.forEach(corner => {
-                if (corner)
+                if (corner) {
+                    corner._remove_connections();
                     corner.destroy();
+                }
             });
 
         // reset the corners buffer
@@ -99,16 +92,57 @@ let ScreenCorner = GObject.registerClass(
 
             this._corner = corner;
             this._prefs = prefs;
+            this._monitor = monitor;
 
-            this.add_constraint(new Layout.MonitorConstraint({ index: monitor.index }));
+            this._monitor_changed_id = Main.layoutManager.connect(
+                'monitors-changed',
+                this._update_allocation.bind(this)
+            );
 
-            if (corner === Meta.DisplayCorner.TOPRIGHT ||
-                corner === Meta.DisplayCorner.BOTTOMRIGHT)
-                this.x_align = Clutter.ActorAlign.END;
+            this._workareas_changed_id = global.display.connect(
+                'workareas-changed',
+                this._update_allocation.bind(this)
+            );
 
-            if (corner === Meta.DisplayCorner.BOTTOMLEFT ||
-                corner === Meta.DisplayCorner.BOTTOMRIGHT)
-                this.y_align = Clutter.ActorAlign.END;
+            this._update_allocation();
+        }
+
+        _remove_connections() {
+            if (this._monitor_changed_id) {
+                Main.layoutManager.disconnect(this._monitor_changed_id);
+                this._monitor_changed_id = null;
+            }
+            if (this._workareas_changed_id) {
+                global.display.disconnect(this._workareas_changed_id);
+                this._workareas_changed_id = null;
+            }
+        }
+
+        _update_allocation() {
+            let node = this.get_theme_node();
+            // if panel corners exist, try to use their theme node
+            if (Main.panel._leftCorner);
+            node = Main.panel._leftCorner.get_theme_node();
+
+            let cornerRadius = Utils.lookup_for_length(node, '-panel-corner-radius', this._prefs);
+
+            switch (this._corner) {
+                case Meta.DisplayCorner.TOPLEFT:
+                    this.set_position(0, 0);
+                    break;
+
+                case Meta.DisplayCorner.TOPRIGHT:
+                    this.set_position(this._monitor.width - cornerRadius, 0);
+                    break;
+
+                case Meta.DisplayCorner.BOTTOMLEFT:
+                    this.set_position(0, this._monitor.height - cornerRadius);
+                    break;
+
+                case Meta.DisplayCorner.BOTTOMRIGHT:
+                    this.set_position(this._monitor.width - cornerRadius, this._monitor.height - cornerRadius);
+                    break;
+            }
         }
 
         vfunc_repaint() {
@@ -170,6 +204,7 @@ let ScreenCorner = GObject.registerClass(
             let cornerRadius = Utils.lookup_for_length(node, '-panel-corner-radius', this._prefs);
 
             this.set_size(cornerRadius, cornerRadius);
+            this._update_allocation();
         }
     }
 );
