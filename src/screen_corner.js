@@ -128,19 +128,19 @@ let ScreenCorner = GObject.registerClass(
 
             switch (this._corner) {
                 case Meta.DisplayCorner.TOPLEFT:
-                    this.set_position(0, 0);
+                    this.set_position(this._monitor.x + 0, this._monitor.y + 0);
                     break;
 
                 case Meta.DisplayCorner.TOPRIGHT:
-                    this.set_position(this._monitor.width - cornerRadius, 0);
+                    this.set_position(this._monitor.x + this._monitor.width - cornerRadius, this._monitor.y + 0);
                     break;
 
                 case Meta.DisplayCorner.BOTTOMLEFT:
-                    this.set_position(0, this._monitor.height - cornerRadius);
+                    this.set_position(this._monitor.x + 0, this._monitor.y + this._monitor.height - cornerRadius);
                     break;
 
                 case Meta.DisplayCorner.BOTTOMRIGHT:
-                    this.set_position(this._monitor.width - cornerRadius, this._monitor.height - cornerRadius);
+                    this.set_position(this._monitor.x + this._monitor.width - cornerRadius, this._monitor.y + this._monitor.height - cornerRadius);
                     break;
             }
         }
