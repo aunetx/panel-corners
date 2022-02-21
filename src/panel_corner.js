@@ -11,10 +11,11 @@ const SYNC_CREATE = GObject.BindingFlags.SYNC_CREATE;
 
 
 var PanelCorners = class PanelCorners {
-    constructor(prefs, connections, old_corners) {
+    constructor(prefs, connections, old_corners, show) {
         this._prefs = prefs;
         this._connections = connections;
         this._old_corners = old_corners;
+        this._show = show;
     }
 
     /// Updates the corners.
@@ -28,8 +29,12 @@ var PanelCorners = class PanelCorners {
         this.remove();
 
         // create each corner
-        Main.panel._leftCorner = new PanelCorner(St.Side.LEFT, this._prefs);
-        Main.panel._rightCorner = new PanelCorner(St.Side.RIGHT, this._prefs);
+        Main.panel._leftCorner = new PanelCorner(
+            St.Side.LEFT, this._prefs, this._show
+        );
+        Main.panel._rightCorner = new PanelCorner(
+            St.Side.RIGHT, this._prefs, this._show
+        );
 
         // update each of them
         this.update_corner(Main.panel._leftCorner);
@@ -103,11 +108,16 @@ var PanelCorners = class PanelCorners {
 
 const PanelCorner = GObject.registerClass(
     class PanelCorner extends St.DrawingArea {
-        _init(side, prefs) {
+        _init(side, prefs, show) {
             this._side = side;
             this._prefs = prefs;
+            this._show = show;
 
             super._init({ style_class: 'panel-corner' });
+
+            if (!this._show) {
+                this.hide();
+            }
         }
 
         _findRightmostButton(container) {

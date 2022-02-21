@@ -12,7 +12,14 @@
         <!-- SCREEN CORNERS -->
         <key type="b" name="screen-corners">
             <default>true</default>
-            <summary>Whether or not to have rounded corners on the bottom of the screen and on other monitors</summary>
+            <summary>Whether or not to have rounded corners around the screen and on other monitors</summary>
+            <description />
+        </key>
+
+        <!-- PANEL CORNERS -->
+        <key type="b" name="panel-corners">
+            <default>true</default>
+            <summary>Whether or not to have rounded corners on the bottom of the panel</summary>
             <description />
         </key>
 

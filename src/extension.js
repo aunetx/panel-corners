@@ -18,6 +18,7 @@ const [GS_MAJOR, GS_MINOR] = Config.PACKAGE_VERSION.split('.');
 const Keys = [
     { type: Type.B, name: "force-extension-values" },
     { type: Type.B, name: "screen-corners" },
+    { type: Type.B, name: "panel-corners" },
     { type: Type.I, name: "panel-corner-radius" },
     { type: Type.I, name: "panel-corner-border-width" },
     { type: Type.S, name: "panel-corner-background-color" },
@@ -65,12 +66,17 @@ class Extension {
         }
 
         // create the panel corners manager
-        this._panel_corners = new PanelCorners(
-            this._prefs, new Connections, this._old_corners
-        );
+        this.create_panel_corners();
 
-        // create the screen corners manager needed
+        // create the screen corners manager if needed
         this.create_screen_corners();
+
+        // create and update the panel corners manager if the preference is
+        // changed
+        this._prefs.PANEL_CORNERS.changed(_ => {
+            this.create_panel_corners();
+            this.update();
+        });
 
         // create and update the screen corners manager if the preference is
         // changed
@@ -81,6 +87,21 @@ class Extension {
 
         // finally update our corners
         this.update();
+    }
+
+    /// Creates the panel corners manager if needed.
+    ///
+    /// If panel corners are deactivated, the existing corners are destroyed.
+    create_panel_corners() {
+        if (this._panel_corners) {
+            this._panel_corners.remove();
+            delete this._panel_corners;
+        }
+
+        let show = this._prefs.PANEL_CORNERS.get();
+        this._panel_corners = new PanelCorners(
+            this._prefs, new Connections, this._old_corners, show
+        );
     }
 
     /// Creates the screen corners manager if needed.
