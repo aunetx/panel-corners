@@ -113,11 +113,11 @@ var PanelCorners = class PanelCorners {
 const PanelCorner = GObject.registerClass(
     class PanelCorner extends St.DrawingArea {
         _init(side, prefs, show) {
+            super._init({ style_class: 'panel-corner' });
+
             this._side = side;
             this._prefs = prefs;
             this._show = show;
-
-            super._init({ style_class: 'panel-corner' });
 
             this._position_changed_id = Main.panel.connect(
                 'notify::position',
@@ -148,20 +148,32 @@ const PanelCorner = GObject.registerClass(
         }
 
         _update_allocation() {
-            let node = this.get_theme_node();
-            let cornerRadius = Utils.lookup_for_length(node, '-panel-corner-radius', this._prefs);
+            let childBox = new Clutter.ActorBox();
 
-            let monitor = Main.layoutManager.primaryMonitor;
+            let cornerWidth, cornerHeight;
+            [, cornerWidth] = this.get_preferred_width(-1);
+            [, cornerHeight] = this.get_preferred_height(-1);
+
+            let allocWidth = Main.panel.width;
+            let allocHeight = Main.panel.height;
 
             switch (this._side) {
                 case St.Side.LEFT:
-                    this.set_position(monitor.x + 0, monitor.y + 0);
+                    childBox.x1 = 0;
+                    childBox.x2 = cornerWidth;
+                    childBox.y1 = allocHeight;
+                    childBox.y2 = allocHeight + cornerHeight;
                     break;
 
                 case St.Side.RIGHT:
-                    this.set_position(monitor.x + monitor.width - cornerRadius, monitor.y + 0);
+                    childBox.x1 = allocWidth - cornerWidth;
+                    childBox.x2 = allocWidth;
+                    childBox.y1 = allocHeight;
+                    childBox.y2 = allocHeight + cornerHeight;
                     break;
             }
+
+            this.allocate(childBox);
         }
 
         vfunc_repaint() {
