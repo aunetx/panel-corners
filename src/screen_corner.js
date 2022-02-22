@@ -121,8 +121,8 @@ let ScreenCorner = GObject.registerClass(
         _update_allocation() {
             let node = this.get_theme_node();
             // if panel corners exist, try to use their theme node
-            if (Main.panel._leftCorner);
-            node = Main.panel._leftCorner.get_theme_node();
+            if (Main.panel._leftCorner)
+                node = Main.panel._leftCorner.get_theme_node();
 
             let cornerRadius = Utils.lookup_for_length(node, '-panel-corner-radius', this._prefs);
 

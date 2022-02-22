@@ -26,7 +26,6 @@ var Type = {
 var Prefs = class Prefs {
     constructor(keys) {
         let settings = this.settings = ExtensionUtils.getSettings();
-        log(this.settings);
         this.keys = keys;
 
         this.keys.forEach(key => {
