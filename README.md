@@ -52,9 +52,9 @@ This extension was created for GNOME 42 and later, but is backward-compatible.
 
 Supported GNOME shell versions are:
 
-- GNOME shell 42
-- GNOME shell 41
-- GNOME shell 40
+- GNOME shell 42 : last extension version
+- GNOME shell 41 : up to version 3
+- GNOME shell 40 : up to version 3
 
 ## License
 
