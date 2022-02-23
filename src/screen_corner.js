@@ -119,12 +119,7 @@ let ScreenCorner = GObject.registerClass(
         }
 
         _update_allocation() {
-            let node = this.get_theme_node();
-            // if panel corners exist, try to use their theme node
-            if (Main.panel._leftCorner)
-                node = Main.panel._leftCorner.get_theme_node();
-
-            let cornerRadius = Utils.lookup_for_length(node, '-panel-corner-radius', this._prefs);
+            let cornerRadius = Utils.lookup_for_length(null, '-screen-corner-radius', this._prefs);
 
             switch (this._corner) {
                 case Meta.DisplayCorner.TOPLEFT:
@@ -146,14 +141,8 @@ let ScreenCorner = GObject.registerClass(
         }
 
         vfunc_repaint() {
-            let node = this.get_theme_node();
-
-            // if panel corners exist, try to use their theme node
-            if (Main.panel._leftCorner)
-                node = Main.panel._leftCorner.get_theme_node();
-
-            let cornerRadius = Utils.lookup_for_length(node, '-panel-corner-radius', this._prefs);
-            let backgroundColor = Utils.lookup_for_color(node, '-panel-corner-background-color', this._prefs);
+            let cornerRadius = Utils.lookup_for_length(null, '-screen-corner-radius', this._prefs);
+            let backgroundColor = Utils.lookup_for_color(null, '-screen-corner-background-color', this._prefs);
 
             let cr = this.get_context();
             cr.setOperator(Cairo.Operator.SOURCE);
@@ -195,13 +184,7 @@ let ScreenCorner = GObject.registerClass(
         vfunc_style_changed() {
             super.vfunc_style_changed();
 
-            let node = this.get_theme_node();
-
-            // if panel corners exist, try to use their theme node
-            if (Main.panel._leftCorner)
-                node = Main.panel._leftCorner.get_theme_node();
-
-            let cornerRadius = Utils.lookup_for_length(node, '-panel-corner-radius', this._prefs);
+            let cornerRadius = Utils.lookup_for_length(null, '-screen-corner-radius', this._prefs);
 
             this.set_size(cornerRadius, cornerRadius);
             this._update_allocation();

@@ -8,9 +8,11 @@ const Me = imports.misc.extensionUtils.getCurrentExtension();
 
 
 var lookup_for_length = function (node, prop, prefs) {
-    const use_extension_values = prefs.FORCE_EXTENSION_VALUES.get();
+    const use_extension_values = node && prefs.FORCE_EXTENSION_VALUES.get();
 
-    let lookup = node.lookup_length(prop, false);
+    let lookup = [];
+    if (use_extension_values)
+        lookup = node.lookup_length(prop, false);
 
     if (use_extension_values || !lookup[0]) {
         let scale_factor =
@@ -24,9 +26,11 @@ var lookup_for_length = function (node, prop, prefs) {
 };
 
 var lookup_for_double = function (node, prop, prefs) {
-    const use_extension_values = prefs.FORCE_EXTENSION_VALUES.get();
+    const use_extension_values = node && prefs.FORCE_EXTENSION_VALUES.get();
 
-    let lookup = node.lookup_double(prop, false);
+    let lookup = [];
+    if (use_extension_values)
+        lookup = node.lookup_double(prop, false);
 
     if (use_extension_values || !lookup[0]) {
         return prefs.get_property(prop.slice(1)).get();
@@ -36,9 +40,11 @@ var lookup_for_double = function (node, prop, prefs) {
 };
 
 var lookup_for_color = function (node, prop, prefs) {
-    const use_extension_values = prefs.FORCE_EXTENSION_VALUES.get();
+    const use_extension_values = node && prefs.FORCE_EXTENSION_VALUES.get();
 
-    let lookup = node.lookup_color(prop, false);
+    let lookup = [];
+    if (use_extension_values)
+        lookup = node.lookup_color(prop, false);
 
     if (use_extension_values || !lookup[0]) {
         let color_str = prefs.get_property(prop.slice(1)).get();

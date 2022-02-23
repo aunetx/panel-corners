@@ -2,10 +2,38 @@
 <schemalist>
     <schema id="org.gnome.shell.extensions.panel-corners" path="/org/gnome/shell/extensions/panel-corners/">
 
-        <!-- FORCE EXTENSION VALUES -->
-        <key type="b" name="force-extension-values">
-            <default>false</default>
-            <summary>Whether or not to force using extension values; otherwise themes may overwrite it</summary>
+        <!-- PANEL CORNERS -->
+        <key type="b" name="panel-corners">
+            <default>true</default>
+            <summary>Whether or not to have rounded corners on the bottom of the panel</summary>
+            <description />
+        </key>
+
+        <!-- PANEL CORNER RADIUS -->
+        <key type="i" name="panel-corner-radius">
+            <default>12</default>
+            <summary>Radius of the rounded corners</summary>
+            <description />
+        </key>
+
+        <!-- PANEL CORNER BORDER WIDTH -->
+        <key type="i" name="panel-corner-border-width">
+            <default>0</default>
+            <summary>Additionnal width used for the corner</summary>
+            <description />
+        </key>
+
+        <!-- PANEL CORNER BACKGROUND COLOR -->
+        <key type="s" name="panel-corner-background-color">
+            <default>"#000000ff"</default>
+            <summary>Background color of the panel, must be a CSS text-color</summary>
+            <description />
+        </key>
+
+        <!-- PANEL CORNER OPACITY -->
+        <key type="d" name="panel-corner-opacity">
+            <default>1</default>
+            <summary>Opacity of the corner when not in overview</summary>
             <description />
         </key>
 
@@ -16,38 +44,31 @@
             <description />
         </key>
 
-        <!-- PANEL CORNERS -->
-        <key type="b" name="panel-corners">
-            <default>true</default>
-            <summary>Whether or not to have rounded corners on the bottom of the panel</summary>
-            <description />
-        </key>
-
-        <!-- CORNER RADIUS -->
-        <key type="i" name="panel-corner-radius">
+        <!-- SCREEN CORNER RADIUS -->
+        <key type="i" name="screen-corner-radius">
             <default>12</default>
             <summary>Radius of the rounded corners</summary>
             <description />
         </key>
 
-        <!-- CORNER BORDER WIDTH -->
-        <key type="i" name="panel-corner-border-width">
-            <default>2</default>
-            <summary>Additionnal width used for the corner</summary>
-            <description />
-        </key>
-
-        <!-- CORNER BACKGROUND COLOR -->
-        <key type="s" name="panel-corner-background-color">
+        <!-- SCREEN CORNER BACKGROUND COLOR -->
+        <key type="s" name="screen-corner-background-color">
             <default>"#000000ff"</default>
             <summary>Background color of the panel, must be a CSS text-color</summary>
             <description />
         </key>
 
-        <!-- CORNER OPACITY -->
-        <key type="d" name="panel-corner-opacity">
+        <!-- SCREEN CORNER OPACITY -->
+        <key type="d" name="screen-corner-opacity">
             <default>1</default>
-            <summary>Opacity of the corner when not in overview</summary>
+            <summary>Opacity of the corner</summary>
+            <description />
+        </key>
+
+        <!-- FORCE EXTENSION VALUES -->
+        <key type="b" name="force-extension-values">
+            <default>false</default>
+            <summary>Whether or not to force using extension values; otherwise themes may overwrite it</summary>
             <description />
         </key>
 
