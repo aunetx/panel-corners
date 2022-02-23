@@ -1,21 +1,134 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<interface domain="me@aunetx.dev">
+<interface domain="panel-corners@aunetx">
   <template class="MainPage" parent="AdwPreferencesPage">
     <property name="name">main_page</property>
     <property name="title" translatable="yes">Main page</property>
+
     <child>
-      <child>
-        <object class="AdwPreferencesGroup">
-          <property name="title" translatable="yes">Force extension values</property>
-          <property name="description" translatable="yes">Wether or not to force to use extension-defined values, even if the theme supports rounded corners. Has no effect with default Adwaita since GNOME 42.</property>
-          <property name="header-suffix">
-            <object class="GtkSwitch" id="force_extension_values">
-              <property name="valign">center</property>
-            </object>
-          </property>
-          <!-- REST HERE -->
-        </object>
-      </child>
+      <object class="GtkAdjustment" id="radius_adjustment">
+        <property name="lower">0</property>
+        <property name="upper">25</property>
+        <property name="step-increment">1</property>
+      </object>
     </child>
+    <child>
+      <object class="GtkAdjustment" id="opacity_adjustment">
+        <property name="lower">0</property>
+        <property name="upper">100</property>
+        <property name="step-increment">10</property>
+      </object>
+    </child>
+
+    <child>
+      <object class="AdwPreferencesGroup">
+        <property name="title" translatable="yes">Panel corners</property>
+        <property name="header-suffix">
+          <object class="GtkSwitch" id="panel_corners">
+            <property name="valign">center</property>
+          </object>
+        </property>
+
+        <child>
+          <object class="AdwActionRow">
+            <property name="title" translatable="yes">Force extension values</property>
+            <property name="subtitle" translatable="yes">Allows you to override the current theme-defined corner preference, if the theme sets one.</property>
+            <property name="activatable-widget">force_extension_values</property>
+            <child>
+              <object class="GtkSwitch" id="force_extension_values">
+                <property name="valign">center</property>
+              </object>
+            </child>
+          </object>
+        </child>
+
+        <child>
+          <object class="AdwActionRow">
+            <property name="title" translatable="yes">Radius</property>
+            <property name="subtitle" translatable="yes">Recommended size is 12 px, to integrate with applications.</property>
+            <property name="activatable-widget">panel_corner_radius</property>
+            <child>
+              <object class="GtkSpinButton" id="panel_corner_radius">
+                <property name="valign">center</property>
+                <property name="orientation">horizontal</property>
+                <property name="numeric">True</property>
+                <property name="wrap">True</property>
+                <property name="adjustment">radius_adjustment</property>
+                <signal name="value-changed" handler="onValueChanged" swapped="no" />
+                <signal name="output" handler="onOutputChanged" swapped="no" />
+              </object>
+            </child>
+          </object>
+        </child>
+
+        <child>
+          <object class="AdwActionRow">
+            <property name="title" translatable="yes">Background color</property>
+            <property name="subtitle" translatable="yes">Changes the color of corners, black is recommended.</property>
+            <property name="activatable-widget">panel_corner_color</property>
+            <child>
+              <object class="GtkColorButton" id="panel_corner_color">
+                <property name="valign">center</property>
+                <property name="title">Background color</property>
+                <property name="show-editor">True</property>
+                <property name="use-alpha">False</property>
+              </object>
+            </child>
+          </object>
+        </child>
+
+        <child>
+          <object class="AdwActionRow">
+            <property name="title" translatable="yes">Opacity</property>
+            <property name="subtitle" translatable="yes">Defines the corner opacity.</property>
+            <property name="activatable-widget">panel_corner_opacity</property>
+            <child>
+              <object class="GtkSpinButton" id="panel_corner_opacity">
+                <property name="valign">center</property>
+                <property name="orientation">horizontal</property>
+                <property name="numeric">True</property>
+                <property name="wrap">True</property>
+                <property name="adjustment">opacity_adjustment</property>
+                <signal name="value-changed" handler="onValueChanged" swapped="no" />
+                <signal name="output" handler="onOutputChanged" swapped="no" />
+              </object>
+            </child>
+          </object>
+        </child>
+
+      </object>
+    </child>
+
+    <child>
+      <object class="AdwPreferencesGroup">
+        <property name="title" translatable="yes">Screen corners</property>
+        <property name="header-suffix">
+          <object class="GtkSwitch" id="screen_corners">
+            <property name="valign">center</property>
+          </object>
+        </property>
+      </object>
+    </child>
+
+    <child>
+      <object class="AdwPreferencesGroup">
+        <property name="title" translatable="yes">Debug logs</property>
+        <property name="header-suffix">
+          <object class="GtkSwitch" id="debug">
+            <property name="valign">center</property>
+          </object>
+        </property>
+
+        <child>
+          <object class="AdwActionRow">
+            <property name="title" translatable="yes">Makes the extension verbose in logs, activate when you need to report an issue.</property>
+          </object>
+        </child>
+      </object>
+    </child>
+
+    <!-- 
+    { type: Type.D, name: "panel-corner-opacity" },
+    { type: Type.B, name: "debug" },
+    -->
   </template>
 </interface>
