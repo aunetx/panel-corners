@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<interface domain="me@aunetx.dev">
+  <template class="MainPage" parent="AdwPreferencesPage">
+    <property name="name">main_page</property>
+    <property name="title" translatable="yes">Main page</property>
+    <child>
+      <child>
+        <object class="AdwPreferencesGroup">
+          <property name="title" translatable="yes">Force extension values</property>
+          <property name="description" translatable="yes">Wether or not to force to use extension-defined values, even if the theme supports rounded corners. Has no effect with default Adwaita since GNOME 42.</property>
+          <property name="header-suffix">
+            <object class="GtkSwitch" id="force_extension_values">
+              <property name="valign">center</property>
+            </object>
+          </property>
+          <!-- REST HERE -->
+        </object>
+      </child>
+    </child>
+  </template>
+</interface>
