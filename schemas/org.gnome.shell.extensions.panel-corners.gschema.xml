@@ -67,7 +67,7 @@
 
         <!-- FORCE EXTENSION VALUES -->
         <key type="b" name="force-extension-values">
-            <default>false</default>
+            <default>true</default>
             <summary>Whether or not to force using extension values; otherwise themes may overwrite it</summary>
             <description />
         </key>

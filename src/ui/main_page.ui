@@ -24,7 +24,7 @@
                 <property name="valign">center</property>
                 <property name="orientation">horizontal</property>
                 <property name="numeric">True</property>
-                <property name="adjustment">radius_adjustment</property>
+                <property name="adjustment">panel_radius_adjustment</property>
               </object>
             </child>
           </object>
@@ -59,7 +59,7 @@
                 <property name="orientation">horizontal</property>
                 <property name="numeric">True</property>
                 <property name="digits">2</property>
-                <property name="adjustment">opacity_adjustment</property>
+                <property name="adjustment">panel_opacity_adjustment</property>
               </object>
             </child>
           </object>
@@ -87,7 +87,7 @@
                 <property name="valign">center</property>
                 <property name="orientation">horizontal</property>
                 <property name="numeric">True</property>
-                <property name="adjustment">radius_adjustment</property>
+                <property name="adjustment">screen_radius_adjustment</property>
               </object>
             </child>
           </object>
@@ -122,7 +122,7 @@
                 <property name="orientation">horizontal</property>
                 <property name="numeric">True</property>
                 <property name="digits">2</property>
-                <property name="adjustment">opacity_adjustment</property>
+                <property name="adjustment">screen_opacity_adjustment</property>
               </object>
             </child>
           </object>
