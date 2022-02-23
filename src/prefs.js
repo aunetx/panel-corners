@@ -26,9 +26,12 @@ const Preferences = new Prefs(Keys);
 
 const parse_color_from_setting = function (setting, widget) {
     let color_string = setting.get();
-    let is_parsed = widget.rgba.parse(color_string);
+    let color_parsed = new Gdk.RGBA;
+    let is_parsed = color_parsed.parse(color_string);
 
-    if (!is_parsed) {
+    if (is_parsed) {
+        widget.set_rgba(color_parsed);
+    } else {
         // could not parse color, defaulting to black
         setting.set('#000000ff');
     }
