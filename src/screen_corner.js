@@ -187,7 +187,7 @@ let ScreenCorner = GObject.registerClass(
             let cornerRadius = Utils.lookup_for_length(null, '-screen-corner-radius', this._prefs);
             let opacity = Utils.lookup_for_double(null, '-screen-corner-opacity', this._prefs);
 
-            this.set_opacity(opacity);
+            this.set_opacity(opacity * 255);
             this.set_size(cornerRadius, cornerRadius);
             this._update_allocation();
         }
