@@ -16,13 +16,18 @@ const { ScreenCorners } = Me.imports.screen_corner;
 const [GS_MAJOR, GS_MINOR] = Config.PACKAGE_VERSION.split('.');
 
 const Keys = [
-    { type: Type.B, name: "force-extension-values" },
-    { type: Type.B, name: "screen-corners" },
     { type: Type.B, name: "panel-corners" },
     { type: Type.I, name: "panel-corner-radius" },
     { type: Type.I, name: "panel-corner-border-width" },
     { type: Type.S, name: "panel-corner-background-color" },
     { type: Type.D, name: "panel-corner-opacity" },
+
+    { type: Type.B, name: "screen-corners" },
+    { type: Type.I, name: "screen-corner-radius" },
+    { type: Type.S, name: "screen-corner-background-color" },
+    { type: Type.D, name: "screen-corner-opacity" },
+
+    { type: Type.B, name: "force-extension-values" },
     { type: Type.B, name: "debug" },
 ];
 
