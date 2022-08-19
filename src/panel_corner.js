@@ -212,6 +212,7 @@ const PanelCorner = GObject.registerClass(
             // if using extension values and in overview, set transparent
             if (
                 this._prefs.FORCE_EXTENSION_VALUES.get() &&
+                Main.panel.get_style_pseudo_class() &&
                 Main.panel.get_style_pseudo_class().includes('overview')
             )
                 opacity = 0.;
