@@ -11,11 +11,9 @@ const SYNC_CREATE = GObject.BindingFlags.SYNC_CREATE;
 
 
 var PanelCorners = class PanelCorners {
-    constructor(prefs, connections, old_corners, show) {
+    constructor(prefs, connections) {
         this._prefs = prefs;
         this._connections = connections;
-        this._old_corners = old_corners;
-        this._show = show;
     }
 
     /// Updates the corners.
@@ -30,10 +28,10 @@ var PanelCorners = class PanelCorners {
 
         // create each corner
         Main.panel._leftCorner = new PanelCorner(
-            St.Side.LEFT, this._prefs, this._show
+            St.Side.LEFT, this._prefs
         );
         Main.panel._rightCorner = new PanelCorner(
-            St.Side.RIGHT, this._prefs, this._show
+            St.Side.RIGHT, this._prefs
         );
 
         // update each of them
@@ -48,8 +46,11 @@ var PanelCorners = class PanelCorners {
         // bind corner style to the panel style
         Main.panel.bind_property('style', corner, 'style', SYNC_CREATE);
 
-        // add corner to the panel, showing it
+        // add corner to the panel
         Main.panel.add_child(corner);
+
+        // update its style, showing it
+        corner.vfunc_style_changed();
 
         // connect to each preference change from the extension, allowing the
         // corner to be updated when the user changes preferences
@@ -88,19 +89,14 @@ var PanelCorners = class PanelCorners {
 
     /// Removes the given corner.
     remove_corner(corner) {
-        // remove connections if the function exist (not default corners)
-        if (corner._remove_connections)
-            corner._remove_connections();
+        // remove connections
+        corner._remove_connections();
 
         // remove from panel
         Main.panel.remove_child(corner);
 
-        // if not an original corner, destroy it
-        if (
-            !this._old_corners ||
-            (this._old_corners && !this._old_corners.includes(corner))
-        )
-            corner.destroy();
+        // destroy the corner
+        corner.destroy();
     }
 
     _log(str) {
@@ -112,12 +108,11 @@ var PanelCorners = class PanelCorners {
 
 const PanelCorner = GObject.registerClass(
     class PanelCorner extends St.DrawingArea {
-        _init(side, prefs, show) {
+        _init(side, prefs) {
             super._init({ style_class: 'panel-corner' });
 
             this._side = side;
             this._prefs = prefs;
-            this._show = show;
 
             this._position_changed_id = Main.panel.connect(
                 'notify::position',
@@ -130,10 +125,6 @@ const PanelCorner = GObject.registerClass(
             );
 
             this._update_allocation();
-
-            if (!this._show) {
-                this.hide();
-            }
         }
 
         _remove_connections() {

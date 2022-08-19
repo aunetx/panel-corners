@@ -15,7 +15,7 @@ const CornersList = [
 
 
 var ScreenCorners = class ScreenCorners {
-    constructor(prefs, connections, old_corners) {
+    constructor(prefs, connections) {
         this._prefs = prefs;
         this._connections = connections;
     }
@@ -69,7 +69,6 @@ var ScreenCorners = class ScreenCorners {
         if (layoutManager._screenCorners)
             layoutManager._screenCorners.forEach(corner => {
                 if (corner) {
-                    corner._remove_connections();
                     corner.destroy();
                 }
             });
@@ -94,28 +93,7 @@ let ScreenCorner = GObject.registerClass(
             this._prefs = prefs;
             this._monitor = monitor;
 
-            this._monitor_changed_id = Main.layoutManager.connect(
-                'monitors-changed',
-                this._update_allocation.bind(this)
-            );
-
-            this._workareas_changed_id = global.display.connect(
-                'workareas-changed',
-                this._update_allocation.bind(this)
-            );
-
             this._update_allocation();
-        }
-
-        _remove_connections() {
-            if (this._monitor_changed_id) {
-                Main.layoutManager.disconnect(this._monitor_changed_id);
-                this._monitor_changed_id = null;
-            }
-            if (this._workareas_changed_id) {
-                global.display.disconnect(this._workareas_changed_id);
-                this._workareas_changed_id = null;
-            }
         }
 
         _update_allocation() {
@@ -123,19 +101,31 @@ let ScreenCorner = GObject.registerClass(
 
             switch (this._corner) {
                 case Meta.DisplayCorner.TOPLEFT:
-                    this.set_position(this._monitor.x + 0, this._monitor.y + 0);
+                    this.set_position(
+                        this._monitor.x,
+                        this._monitor.y
+                    );
                     break;
 
                 case Meta.DisplayCorner.TOPRIGHT:
-                    this.set_position(this._monitor.x + this._monitor.width - cornerRadius, this._monitor.y + 0);
+                    this.set_position(
+                        this._monitor.x + this._monitor.width - cornerRadius,
+                        this._monitor.y
+                    );
                     break;
 
                 case Meta.DisplayCorner.BOTTOMLEFT:
-                    this.set_position(this._monitor.x + 0, this._monitor.y + this._monitor.height - cornerRadius);
+                    this.set_position(
+                        this._monitor.x,
+                        this._monitor.y + this._monitor.height - cornerRadius
+                    );
                     break;
 
                 case Meta.DisplayCorner.BOTTOMRIGHT:
-                    this.set_position(this._monitor.x + this._monitor.width - cornerRadius, this._monitor.y + this._monitor.height - cornerRadius);
+                    this.set_position(
+                        this._monitor.x + this._monitor.width - cornerRadius,
+                        this._monitor.y + this._monitor.height - cornerRadius
+                    );
                     break;
             }
         }

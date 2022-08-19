@@ -42,6 +42,18 @@ class Extension {
 
         this._log("starting up...");
 
+        this._connections.connect(
+            Main.layoutManager,
+            'monitors-changed',
+            _ => this.update()
+        );
+
+        this._connections.connect(
+            global.display,
+            'workareas-changed',
+            _ => this.update()
+        );
+
         // load the extension when the shell has finished starting up
         if (Main.layoutManager._startingUp)
             this._connections.connect(
@@ -55,21 +67,8 @@ class Extension {
 
     /// Called when the shell has finished starting up.
     ///
-    /// It saves existing corners, if any, and create our new corners.
+    /// It create our new corners.
     load() {
-        let panel = Main.panel;
-
-        // if GNOME still supports them, and they do exist, then save existing
-        // corners to replace them on extension disable
-        if (
-            GS_MAJOR < 42 &&
-            panel._leftCorner && panel._rightCorner
-        ) {
-            this._old_corners = [panel._leftCorner, panel._rightCorner];
-        } else {
-            this._old_corners = null;
-        }
-
         // create the panel corners manager
         this.create_panel_corners();
 
@@ -103,10 +102,11 @@ class Extension {
             delete this._panel_corners;
         }
 
-        let show = this._prefs.PANEL_CORNERS.get();
-        this._panel_corners = new PanelCorners(
-            this._prefs, new Connections, this._old_corners, show
-        );
+        if (this._prefs.PANEL_CORNERS.get()) {
+            this._panel_corners = new PanelCorners(
+                this._prefs, new Connections
+            );
+        }
     }
 
     /// Creates the screen corners manager if needed.
@@ -120,7 +120,7 @@ class Extension {
 
         if (this._prefs.SCREEN_CORNERS.get()) {
             this._screen_corners = new ScreenCorners(
-                this._prefs, new Connections, this._old_corners
+                this._prefs, new Connections
             );
         }
     }
@@ -129,7 +129,9 @@ class Extension {
     update() {
         this._log("updating corners...");
 
-        this._panel_corners.update();
+        if (this._panel_corners)
+            this._panel_corners.update();
+
         if (this._screen_corners)
             this._screen_corners.update();
 
@@ -142,7 +144,9 @@ class Extension {
     /// by the extension on load; in which case it keep them intact to restore
     /// them on extension disable.
     remove() {
-        this._panel_corners.remove();
+        if (this._panel_corners)
+            this._panel_corners.remove();
+
         if (this._screen_corners)
             this._screen_corners.remove();
     }
@@ -153,22 +157,14 @@ class Extension {
 
         this._connections.disconnect_all();
 
-        let panel = Main.panel;
-
-        // if using GNOME < 42, restore default corners
-        if (this._old_corners) {
-            [panel._leftCorner, panel._rightCorner] = this._old_corners;
-
-            // TODO fix crash when replacing child due to Blur my Shell
-            panel.add_child(panel._leftCorner);
-            panel.add_child(panel._rightCorner);
-        }
-
         this._log("extension disabled.");
 
-        delete this._panel_corners;
+        if (this._panel_corners)
+            delete this._panel_corners;
+
         if (this._screen_corners)
             delete this._screen_corners;
+
         delete this._connections;
         delete this._prefs;
     }
