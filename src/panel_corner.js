@@ -8,7 +8,7 @@ const Me = imports.misc.extensionUtils.getCurrentExtension();
 const Utils = Me.imports.utils;
 
 const SYNC_CREATE = GObject.BindingFlags.SYNC_CREATE;
-
+const ANIMATION_TIME = imports.ui.overview.ANIMATION_TIME;
 
 var PanelCorners = class PanelCorners {
     constructor(prefs, connections) {
@@ -204,9 +204,6 @@ const PanelCorner = GObject.registerClass(
             let cornerRadius = Utils.lookup_for_length(node, '-panel-corner-radius', this._prefs);
             let borderWidth = Utils.lookup_for_length(node, '-panel-corner-border-width', this._prefs);
 
-            const transitionDuration =
-                node.get_transition_duration() / St.Settings.get().slow_down_factor;
-
             let opacity = Utils.lookup_for_double(node, '-panel-corner-opacity', this._prefs);
 
             // if using extension values and in overview, set transparent
@@ -224,7 +221,7 @@ const PanelCorner = GObject.registerClass(
             this.remove_transition('opacity');
             this.ease({
                 opacity: opacity * 255,
-                duration: transitionDuration,
+                duration: ANIMATION_TIME,
                 mode: Clutter.AnimationMode.EASE_IN_OUT_QUAD,
             });
         }
