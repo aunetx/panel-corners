@@ -37,28 +37,24 @@ const parse_color_from_setting = function (setting, widget) {
     }
 };
 
-class MainPage extends Adw.PreferencesPage {
-    static {
-        GObject.registerClass({
-            GTypeName: 'MainPage',
-            Template: `file://${GLib.build_filenamev([import.meta.url, 'ui', 'main_page.ui'])}`,
-            InternalChildren: [
-                'panel_corners',
-                'panel_corner_color',
-                'panel_radius_adjustment',
-                'panel_opacity_adjustment',
+const MainPage = GObject.registerClass({
+    GTypeName: 'MainPage',
+    Template: `file://${GLib.build_filenamev([import.meta.url, 'ui', 'main_page.ui'])}`,
+    InternalChildren: [
+        'panel_corners',
+        'panel_corner_color',
+        'panel_radius_adjustment',
+        'panel_opacity_adjustment',
 
-                'screen_corners',
-                'screen_corner_color',
-                'screen_radius_adjustment',
-                'screen_opacity_adjustment',
+        'screen_corners',
+        'screen_corner_color',
+        'screen_radius_adjustment',
+        'screen_opacity_adjustment',
 
-                'force_extension_values',
-                'debug',
-            ],
-        }, this);
-    }
-
+        'force_extension_values',
+        'debug',
+    ],
+}, class MainPage extends Adw.PreferencesPage {
     constructor(preferences, props = {}) {
         super(props);
 
@@ -94,7 +90,7 @@ class MainPage extends Adw.PreferencesPage {
         this.preferences.settings.bind('force-extension-values', this._force_extension_values, 'state', Gio.SettingsBindFlags.DEFAULT);
         this.preferences.settings.bind('debug', this._debug, 'state', Gio.SettingsBindFlags.DEFAULT);
     }
-}
+});
 
 
 export default class ForgeExtentionPreferences extends ExtensionPreferences {
