@@ -60,17 +60,6 @@ class MainPage extends Adw.PreferencesPage {
         }, this);
     }
 
-    _panel_corners;
-    _panel_corner_color;
-    _panel_radius_adjustment;
-    _panel_opacity_adjustment;
-    _screen_corners;
-    _screen_corner_color;
-    _screen_radius_adjustment;
-    _screen_opacity_adjustment;
-    _force_extension_values;
-    _debug;
-;
     constructor(props = {}) {
         super(props);
     }
