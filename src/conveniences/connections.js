@@ -1,9 +1,7 @@
-'use strict';
-
-const GObject = imports.gi.GObject;
+import GObject from 'gi://GObject';
 
 /// An object to easily manage signals.
-var Connections = class Connections {
+export class Connections {
     constructor() {
         this.buffer = [];
     }
@@ -92,6 +90,6 @@ var Connections = class Connections {
 
     _log(str) {
         // no need to check if DEBUG here as this._log is only used on error
-        log(`[Panel corners] ${str}`);
+        console.log(`[Panel corners] ${str}`);
     }
-};
+}

@@ -1,13 +1,8 @@
-'use strict';
+// @ts-check
+import Clutter from 'gi://Clutter';
+import St from 'gi://St'
 
-const { Clutter, St } = imports.gi;
-const Main = imports.ui.main;
-const Cairo = imports.cairo;
-
-const Me = imports.misc.extensionUtils.getCurrentExtension();
-
-
-var lookup_for_length = function (node, prop, prefs) {
+export function lookup_for_length(node, prop, prefs) {
     const use_extension_values = node && prefs.FORCE_EXTENSION_VALUES.get();
 
     let lookup = [];
@@ -25,7 +20,7 @@ var lookup_for_length = function (node, prop, prefs) {
     }
 };
 
-var lookup_for_double = function (node, prop, prefs) {
+export function lookup_for_double(node, prop, prefs) {
     const use_extension_values = node && prefs.FORCE_EXTENSION_VALUES.get();
 
     let lookup = [];
@@ -39,7 +34,7 @@ var lookup_for_double = function (node, prop, prefs) {
     }
 };
 
-var lookup_for_color = function (node, prop, prefs) {
+export function lookup_for_color(node, prop, prefs) {
     const use_extension_values = node && prefs.FORCE_EXTENSION_VALUES.get();
 
     let lookup = [];

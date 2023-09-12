@@ -1,11 +1,8 @@
-'use strict';
-
-const Gio = imports.gi.Gio;
-
-const ExtensionUtils = imports.misc.extensionUtils;
+// @ts-check
+import Gio from "gi://Gio";
 
 /// An enum non-extensively describing the type of a gsettings key.
-var Type = {
+export const Type = {
     B: 'Boolean',
     I: 'Integer',
     D: 'Double',
@@ -23,9 +20,9 @@ var Type = {
 ///
 /// Each {type, name} object represents a gsettings key, which must be created
 /// in the gschemas.xml file of the extension.
-var Prefs = class Prefs {
-    constructor(keys) {
-        let settings = this.settings = ExtensionUtils.getSettings();
+export class Prefs {
+    constructor(keys, settings) {
+        this.settings;
         this.keys = keys;
 
         this.keys.forEach(key => {
