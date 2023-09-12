@@ -1,4 +1,3 @@
-// @ts-check
 import Clutter from 'gi://Clutter';
 import St from 'gi://St'
 import GObject from 'gi://GObject';
@@ -11,10 +10,16 @@ const SYNC_CREATE = GObject.BindingFlags.SYNC_CREATE;
 
 
 export class PanelCorners {
+    /** @type {import('./conveniences/settings.js').Prefs} */
     #prefs;
 
+    /** @type {import('./conveniences/connections.js').Connections} */
     #connections;
 
+    /**
+     * @param {import('./conveniences/settings.js').Prefs} prefs
+     * @param {import("./conveniences/connections.js").Connections} connections
+     */
     constructor(prefs, connections) {
         this.#prefs = prefs;
         this.#connections = connections;
@@ -49,6 +54,7 @@ export class PanelCorners {
 
     /**
      * Updates the given corner.
+     * @param {PanelCorner} corner
      */
     update_corner(corner) {
         // bind corner style to the panel style

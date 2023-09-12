@@ -1,4 +1,3 @@
-// @ts-check
 import * as Main from 'resource:///org/gnome/shell/ui/main.js'
 import { Extension, gettext as _ } from 'resource:///org/gnome/shell/extensions/extension.js';
 
@@ -8,7 +7,8 @@ import { Prefs, Type } from './conveniences/settings.js';
 import { PanelCorners } from './panel_corner.js';
 import { ScreenCorners } from './screen_corner.js';
 
-const Keys = [
+/** @type {import('./conveniences/settings.js').KeyType[]} */
+const Keys = ([
     { type: Type.B, name: "panel-corners" },
     { type: Type.I, name: "panel-corner-radius" },
     { type: Type.I, name: "panel-corner-border-width" },
@@ -22,16 +22,20 @@ const Keys = [
 
     { type: Type.B, name: "force-extension-values" },
     { type: Type.B, name: "debug" },
-];
+]);
 
 
 export default class PanelCornersExtension extends Extension {
+    /** @type {Prefs} */
     #prefs;
 
+    /** @type {Connections} */
     #connections;
 
+    /** @type {PanelCorners} */
     #panel_corners;
 
+    /** @type {ScreenCorners} */
     #screen_corners;
 
     /** Called on extension enable. */

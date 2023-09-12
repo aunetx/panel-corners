@@ -1,7 +1,19 @@
-// @ts-check
-import Gio from "gi://Gio";
 
-/// An enum non-extensively describing the type of a gsettings key.
+/**
+ * @typedef {{
+ *   type: Type['B'];
+ *   name: 'panel-corners' | 'screen-corners' | 'debug' | 'force-extension-values';
+ * } | {
+ *   type: Type['I' | 'D'];
+ *   name: 'panel-corner-radius' | 'panel-corner-border-width' | 'panel-corner-opacity' | 'screen-corner-radius' | 'screen-corner-opacity';
+ * } | {
+ *   type: Type['S'];
+ *   name: `${'panel'|'screen'}-corner-background-color`
+ * }} KeyType */
+
+/** @typedef {'PANEL_CORNERS' | 'SCREEN_CORNERS' | 'DEBUG' | 'FORCE_EXTENSION_VALUES' | 'PANEL_CORNER_RADIUS' | 'PANEL_CORNER_BORDER_WIDTH' | 'PANEL_CORNER_BACKGROUND_COLOR' | 'PANEL_CORNER_OPACITY' | 'SCREEN_CORNER_RADIUS' | 'SCREEN_CORNER_BACKGROUND_COLOR' | 'SCREEN_CORNER_OPACITY'} PrefsKey */
+
+/** An enum non-extensively describing the type of a gsettings key. */
 export const Type = {
     B: 'Boolean',
     I: 'Integer',
@@ -9,123 +21,175 @@ export const Type = {
     S: 'String'
 };
 
-/// An object to get and manage the gsettings preferences.
-///
-/// Should be initialized with an array of keys, for example:
-///
-/// let prefs = new Prefs([
-///     { type: Type.I, name: "panel-corner-radius" },
-///     { type: Type.B, name: "debug" }
-/// ]);
-///
-/// Each {type, name} object represents a gsettings key, which must be created
-/// in the gschemas.xml file of the extension.
+/**
+ * @template T
+ */
+class Pref {
+    /** @type{string} */
+    key;
+
+    /** @type{number} */
+    #id
+
+    /**
+     * @param {import('@girs/gio-2.0').Settings} settings
+     * @param {KeyType} key
+     */
+    constructor(settings, key) {
+        this.key = key.name;
+        this.settings = settings;
+    }
+
+    /**
+     * @param {(...args: any[]) => unknown} cb
+     */
+    changed(cb) {
+        this.#id = this.settings.connect('changed::' + this.key, cb);
+        return this.#id
+    }
+
+    /**
+     * @param {number} [id = this.#id]
+     */
+    disconnect(id = this.#id) {
+        return this.settings.disconnect(id);
+    }
+
+    /** @return {T} */
+    get() { return }
+    /** @param {T} v */
+    set(v) { }
+}
+
+/** @extends {Pref<boolean>} */
+class BooleanPref extends Pref {
+    get() {
+        return this.settings.get_boolean(this.key);
+    }
+
+    /** @param {boolean} v */
+    set(v) {
+        this.settings.set_boolean(this.key, v);
+    }
+}
+
+/** @extends {Pref<number>} */
+class IntPref extends Pref {
+  get() {
+    return this.settings.get_int(this.key);
+  }
+
+  /** @param {number} v */
+  set(v) {
+    this.settings.set_int(this.key, v);
+  }
+}
+
+/** @extends {Pref<number>} */
+class DoublePref extends Pref {
+  get() {
+    return this.settings.get_double(this.key);
+  }
+
+  /** @param {number} v */
+  set(v) {
+    this.settings.set_double(this.key, v);
+  }
+}
+
+/** @extends {Pref<string>} */
+class StringPref extends Pref {
+  get() {
+    return this.settings.get_string(this.key);
+  }
+
+  /** @param {string} v */
+  set(v) {
+    this.settings.set_string(this.key, v);
+  }
+}
+
+/**
+ * An object to get and manage the gsettings preferences.
+ *
+ * Should be initialized with an array of keys, for example:
+ *
+ * let prefs = new Prefs([
+ *     { type: Type.I, name: "panel-corner-radius" },
+ *     { type: Type.B, name: "debug" }
+ * ]);
+ *
+ * Each {type, name} object represents a gsettings key, which must be created
+ * in the gschemas.xml file of the extension.
+ */
 export class Prefs {
+    /** @type {Pref} */ PANEL_CORNERS;
+    /** @type {Pref} */ SCREEN_CORNERS;
+    /** @type {Pref} */ DEBUG;
+    /** @type {Pref} */ FORCE_EXTENSION_VALUES;
+
+    /** @type {Pref} */ PANEL_CORNER_RADIUS;
+    /** @type {Pref} */ PANEL_CORNER_BORDER_WIDTH;
+    /** @type {Pref} */ PANEL_CORNER_BACKGROUND_COLOR;
+    /** @type {Pref} */ PANEL_CORNER_OPACITY;
+    /** @type {Pref} */ SCREEN_CORNER_RADIUS;
+    /** @type {Pref} */ SCREEN_CORNER_BACKGROUND_COLOR;
+    /** @type {Pref} */ SCREEN_CORNER_OPACITY;
+
+    /**
+     * @param {KeyType[]} keys
+     * @param {import('@girs/gio-2.0').Settings} settings
+     */
     constructor(keys, settings) {
-        this.settings;
         this.keys = keys;
+        this.settings = settings;
 
         this.keys.forEach(key => {
             let property_name = this.get_property_name(key.name);
 
             switch (key.type) {
                 case Type.B:
-                    this[property_name] = {
-                        key: key.name,
-                        get: function () {
-                            return settings.get_boolean(this.key);
-                        },
-                        set: function (v) {
-                            settings.set_boolean(this.key, v);
-                        },
-                        changed: function (cb) {
-                            return settings.connect('changed::' + this.key, cb);
-                        },
-                        disconnect: function () {
-                            return settings.disconnect.apply(
-                                settings, arguments
-                            );
-                        }
-                    };
+                    this[property_name] = new BooleanPref(settings, key);
                     break;
 
                 case Type.I:
-                    this[property_name] = {
-                        key: key.name,
-                        get: function () {
-                            return settings.get_int(this.key);
-                        },
-                        set: function (v) {
-                            settings.set_int(this.key, v);
-                        },
-                        changed: function (cb) {
-                            return settings.connect('changed::' + this.key, cb);
-                        },
-                        disconnect: function () {
-                            return settings.disconnect.apply(
-                                settings, arguments
-                            );
-                        },
-                    };
+                    this[property_name] = new IntPref(settings, key);
                     break;
 
                 case Type.D:
-                    this[property_name] = {
-                        key: key.name,
-                        get: function () {
-                            return settings.get_double(this.key);
-                        },
-                        set: function (v) {
-                            settings.set_double(this.key, v);
-                        },
-                        changed: function (cb) {
-                            return settings.connect('changed::' + this.key, cb);
-                        },
-                        disconnect: function () {
-                            return settings.disconnect.apply(
-                                settings, arguments
-                            );
-                        },
-                    };
+                    this[property_name] = new DoublePref(settings, key);
                     break;
 
                 case Type.S:
-                    this[property_name] = {
-                        key: key.name,
-                        get: function () {
-                            return settings.get_string(this.key);
-                        },
-                        set: function (v) {
-                            settings.set_string(this.key, v);
-                        },
-                        changed: function (cb) {
-                            return settings.connect('changed::' + this.key, cb);
-                        },
-                        disconnect: function () {
-                            return settings.disconnect.apply(
-                                settings, arguments
-                            );
-                        },
-                    };
+                    this[property_name] = new StringPref(settings, key);
                     break;
             }
         });
     }
 
-    /// From the gschema name, returns the name of the associated property on
-    /// the Prefs object.
+    /**
+     * From the gschema name, returns the name of the associated property on
+     * the Prefs object.
+     * @param {string} name
+     * @return {PrefsKey}
+     */
     get_property_name(name) {
-        return name.replaceAll('-', '_').toUpperCase();
+        return /** @type {PrefsKey} */(name.replaceAll('-', '_').toUpperCase());
     }
 
-    /// From the gschema name, returns the associated property on the Prefs
-    /// object.
+    /**
+     * From the gschema name, returns the associated property on the Prefs
+     * object.
+     * @param {string} name
+     */
     get_property(name) {
         return this[this.get_property_name(name)];
     }
 
-    /// Remove all connections managed by the Prefs object, i.e. created with
-    /// `prefs.PROPERTY.changed(callback)`.
+    /**
+     * Remove all connections managed by the Prefs object, i.e. created with
+     * `prefs.PROPERTY.changed(callback)`.
+     */
     disconnect_all_settings() {
         this.keys.forEach(key => {
             this.get_property(key.name).disconnect();
