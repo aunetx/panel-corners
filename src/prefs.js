@@ -43,7 +43,7 @@ function parse_color_from_setting(setting, widget) {
     }
 };
 
-class MainPage extends Adw.PreferencesPage {
+class MainPage extends /** @type {typeof import('./ui/main_page.d.ts').Controls} */(Adw.PreferencesPage) {
     static {
         GObject.registerClass({
             GTypeName: 'MainPage',
@@ -64,36 +64,6 @@ class MainPage extends Adw.PreferencesPage {
             ],
         }, this);
     }
-
-    /** @type{Gtk.Switch} */
-    _panel_corners;
-
-    /** @type{Gtk.ColorDialogButton} */
-    _panel_corner_color;
-
-    /** @type{GObject.Object} */
-    _panel_radius_adjustment;
-
-    /** @type{GObject.Object} */
-    _panel_opacity_adjustment;
-
-    /** @type{GObject.Object} */
-    _screen_corners;
-
-    /** @type{Gtk.ColorDialogButton} */
-    _screen_corner_color;
-
-    /** @type{GObject.Object} */
-    _screen_radius_adjustment;
-
-    /** @type{GObject.Object} */
-    _screen_opacity_adjustment;
-
-    /** @type{GObject.Object} */
-    _force_extension_values;
-
-    /** @type{GObject.Object} */
-    _debug;
 
     /**
      * @param {Prefs} preferences
@@ -165,6 +135,3 @@ export default class ForgeExtentionPreferences extends ExtensionPreferences {
         window.set_default_size(720, 530);
     }
 }
-
-
-
