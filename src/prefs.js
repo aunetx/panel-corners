@@ -1,12 +1,13 @@
 import Adw from 'gi://Adw';
 import Gdk from 'gi://Gdk?version=4.0';
+import Gtk from 'gi://Gtk?version=4.0';
 import GLib from 'gi://GLib';
 import Gio from 'gi://Gio';
 import GObject from 'gi://GObject';
 
-import { ExtensionPreferences } from "resource:///org/gnome/Shell/Extensions/js/extensions/prefs.js";
+import { ExtensionPreferences } from 'resource:///org/gnome/Shell/Extensions/js/extensions/prefs.js';
 
-import { Prefs, Type } from './conveniences/settings.js';
+import { Prefs, StringPref, Type } from './conveniences/settings.js';
 
 /** @type {import('./conveniences/settings.js').KeyType[]} */
 const Keys = ([
@@ -25,7 +26,11 @@ const Keys = ([
     { type: Type.B, name: "debug" },
 ]);
 
-const parse_color_from_setting = function (setting, widget) {
+/**
+ * @param {StringPref} setting
+ * @param {Gtk.ColorDialogButton} widget
+ */
+function parse_color_from_setting(setting, widget) {
     let color_string = setting.get();
     let color_parsed = new Gdk.RGBA;
     let is_parsed = color_parsed.parse(color_string);
@@ -40,20 +45,9 @@ const parse_color_from_setting = function (setting, widget) {
 
 class MainPage extends Adw.PreferencesPage {
     static {
-    }
-
-    constructor(props = {}) {
-        super(props);
-    }
-
-    /**
-     * @param {Prefs} preferences
-     * @param {string} path
-     */
-    static fromPreferences(preferences, path) {
         GObject.registerClass({
             GTypeName: 'MainPage',
-            Template: `file://${GLib.build_filenamev([path, 'ui', 'main_page.ui'])}`,
+            Template: GLib.uri_resolve_relative(import.meta.url, './ui/main_page.ui', GLib.UriFlags.NONE),
             InternalChildren: [
                 'panel_corners',
                 'panel_corner_color',
@@ -69,6 +63,42 @@ class MainPage extends Adw.PreferencesPage {
                 'debug',
             ],
         }, this);
+    }
+
+    /** @type{Gtk.Switch} */
+    _panel_corners;
+
+    /** @type{Gtk.ColorDialogButton} */
+    _panel_corner_color;
+
+    /** @type{GObject.Object} */
+    _panel_radius_adjustment;
+
+    /** @type{GObject.Object} */
+    _panel_opacity_adjustment;
+
+    /** @type{GObject.Object} */
+    _screen_corners;
+
+    /** @type{Gtk.ColorDialogButton} */
+    _screen_corner_color;
+
+    /** @type{GObject.Object} */
+    _screen_radius_adjustment;
+
+    /** @type{GObject.Object} */
+    _screen_opacity_adjustment;
+
+    /** @type{GObject.Object} */
+    _force_extension_values;
+
+    /** @type{GObject.Object} */
+    _debug;
+
+    /**
+     * @param {Prefs} preferences
+     */
+    static fromPreferences(preferences) {
         const page = new this();
               page.#initPreferences(preferences);
         return page;
@@ -117,10 +147,17 @@ class MainPage extends Adw.PreferencesPage {
     }
 }
 
-
 export default class ForgeExtentionPreferences extends ExtensionPreferences {
     init() { }
 
+    /**
+     * Fill the preferences window with preferences.
+     *
+     * The default implementation adds the widget
+     * returned by getPreferencesWidget().
+     *
+     * @param {Adw.PreferencesWindow} window - the preferences window
+     */
     fillPreferencesWindow(window) {
         this.preferences = new Prefs(Keys, this.getSettings());
         window.add(MainPage.fromPreferences(this.preferences, this.path));

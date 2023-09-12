@@ -1,4 +1,3 @@
-
 /**
  * @typedef {{
  *   type: Type['B'];
@@ -9,11 +8,16 @@
  * } | {
  *   type: Type['S'];
  *   name: `${'panel'|'screen'}-corner-background-color`
- * }} KeyType */
+ * }} KeyType
+ */
 
-/** @typedef {'PANEL_CORNERS' | 'SCREEN_CORNERS' | 'DEBUG' | 'FORCE_EXTENSION_VALUES' | 'PANEL_CORNER_RADIUS' | 'PANEL_CORNER_BORDER_WIDTH' | 'PANEL_CORNER_BACKGROUND_COLOR' | 'PANEL_CORNER_OPACITY' | 'SCREEN_CORNER_RADIUS' | 'SCREEN_CORNER_BACKGROUND_COLOR' | 'SCREEN_CORNER_OPACITY'} PrefsKey */
+/**
+ * @typedef {'PANEL_CORNERS' | 'SCREEN_CORNERS' | 'DEBUG' | 'FORCE_EXTENSION_VALUES' | 'PANEL_CORNER_RADIUS' | 'PANEL_CORNER_BORDER_WIDTH' | 'PANEL_CORNER_BACKGROUND_COLOR' | 'PANEL_CORNER_OPACITY' | 'SCREEN_CORNER_RADIUS' | 'SCREEN_CORNER_BACKGROUND_COLOR' | 'SCREEN_CORNER_OPACITY'} PrefsKey
+ */
 
-/** An enum non-extensively describing the type of a gsettings key. */
+/**
+ * An enum non-extensively describing the type of a gsettings key.
+ */
 export const Type = {
     B: 'Boolean',
     I: 'Integer',
@@ -62,7 +66,7 @@ class Pref {
 }
 
 /** @extends {Pref<boolean>} */
-class BooleanPref extends Pref {
+export class BooleanPref extends Pref {
     get() {
         return this.settings.get_boolean(this.key);
     }
@@ -74,7 +78,7 @@ class BooleanPref extends Pref {
 }
 
 /** @extends {Pref<number>} */
-class IntPref extends Pref {
+export class IntPref extends Pref {
   get() {
     return this.settings.get_int(this.key);
   }
@@ -86,7 +90,7 @@ class IntPref extends Pref {
 }
 
 /** @extends {Pref<number>} */
-class DoublePref extends Pref {
+export class DoublePref extends Pref {
   get() {
     return this.settings.get_double(this.key);
   }
@@ -98,7 +102,7 @@ class DoublePref extends Pref {
 }
 
 /** @extends {Pref<string>} */
-class StringPref extends Pref {
+export class StringPref extends Pref {
   get() {
     return this.settings.get_string(this.key);
   }
@@ -108,6 +112,7 @@ class StringPref extends Pref {
     this.settings.set_string(this.key, v);
   }
 }
+
 
 /**
  * An object to get and manage the gsettings preferences.

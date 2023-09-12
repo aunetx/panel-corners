@@ -14,7 +14,7 @@
   "compilerOptions": {
     "allowJs": true,
     "checkJs": true,
-    "module": "NodeNext",
+    "module": "ES2022",
     "moduleResolution": "NodeNext",
     "lib": ["ES2022"],
     "target": "ES2022"
