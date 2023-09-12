@@ -1,29 +1,12 @@
 /**
- * @typedef {{
- *   type: Type['B'];
- *   name: 'panel-corners' | 'screen-corners' | 'debug' | 'force-extension-values';
- * } | {
- *   type: Type['I' | 'D'];
- *   name: 'panel-corner-radius' | 'panel-corner-border-width' | 'panel-corner-opacity' | 'screen-corner-radius' | 'screen-corner-opacity';
- * } | {
- *   type: Type['S'];
- *   name: `${'panel'|'screen'}-corner-background-color`
- * }} KeyType
- */
-
-/**
- * @typedef {'PANEL_CORNERS' | 'SCREEN_CORNERS' | 'DEBUG' | 'FORCE_EXTENSION_VALUES' | 'PANEL_CORNER_RADIUS' | 'PANEL_CORNER_BORDER_WIDTH' | 'PANEL_CORNER_BACKGROUND_COLOR' | 'PANEL_CORNER_OPACITY' | 'SCREEN_CORNER_RADIUS' | 'SCREEN_CORNER_BACKGROUND_COLOR' | 'SCREEN_CORNER_OPACITY'} PrefsKey
- */
-
-/**
  * An enum non-extensively describing the type of a gsettings key.
  */
-export const Type = {
+export const Type = /** @type {const} */({
     B: 'Boolean',
     I: 'Integer',
     D: 'Double',
     S: 'String'
-};
+});
 
 /**
  * @template T
@@ -37,7 +20,7 @@ class Pref {
 
     /**
      * @param {import('@girs/gio-2.0').Settings} settings
-     * @param {KeyType} key
+     * @param {import('./types.d.ts').KeyType} key
      */
     constructor(settings, key) {
         this.key = key.name;
@@ -142,7 +125,7 @@ export class Prefs {
     /** @type {Pref} */ SCREEN_CORNER_OPACITY;
 
     /**
-     * @param {KeyType[]} keys
+     * @param {import('./types.d.ts').KeyType[]} keys
      * @param {import('@girs/gio-2.0').Settings} settings
      */
     constructor(keys, settings) {
@@ -176,10 +159,12 @@ export class Prefs {
      * From the gschema name, returns the name of the associated property on
      * the Prefs object.
      * @param {string} name
-     * @return {PrefsKey}
+     * @return {import('./types.d.ts').PrefsKey}
      */
     get_property_name(name) {
-        return /** @type {PrefsKey} */(name.replaceAll('-', '_').toUpperCase());
+        return /** @type{import('./types.d.ts').PrefsKey} */(
+            name.replaceAll('-', '_').toUpperCase()
+        );
     }
 
     /**
