@@ -40,9 +40,20 @@ const parse_color_from_setting = function (setting, widget) {
 
 class MainPage extends Adw.PreferencesPage {
     static {
+    }
+
+    constructor(props = {}) {
+        super(props);
+    }
+
+    /**
+     * @param {Prefs} preferences
+     * @param {string} path
+     */
+    static fromPreferences(preferences, path) {
         GObject.registerClass({
             GTypeName: 'MainPage',
-            Template: `file://${GLib.build_filenamev([import.meta.url, 'ui', 'main_page.ui'])}`,
+            Template: `file://${GLib.build_filenamev([path, 'ui', 'main_page.ui'])}`,
             InternalChildren: [
                 'panel_corners',
                 'panel_corner_color',
@@ -58,16 +69,6 @@ class MainPage extends Adw.PreferencesPage {
                 'debug',
             ],
         }, this);
-    }
-
-    constructor(props = {}) {
-        super(props);
-    }
-
-    /**
-   * @param {Prefs} preferences
-   */
-    static fromPreferences(preferences) {
         const page = new this();
               page.#initPreferences(preferences);
         return page;
@@ -82,7 +83,12 @@ class MainPage extends Adw.PreferencesPage {
         // Panel corners
         this.preferences.settings.bind('panel-corners', this._panel_corners, 'state', Gio.SettingsBindFlags.DEFAULT);
         this.preferences.settings.bind('panel-corner-radius', this._panel_radius_adjustment, 'value', Gio.SettingsBindFlags.DEFAULT);
-        this.preferences.settings.bind('panel-corner-opacity', this._panel_opacity_adjustment, 'value', Gio.SettingsBindFlags.DEFAULT);
+        this.preferences.settings.bind(
+          'panel-corner-opacity',
+          this._panel_opacity_adjustment,
+          'value',
+          Gio.SettingsBindFlags.DEFAULT,
+        );
         this.preferences.PANEL_CORNER_BACKGROUND_COLOR.changed(_ => {
             parse_color_from_setting(this.preferences.PANEL_CORNER_BACKGROUND_COLOR, this._panel_corner_color);
         });
@@ -117,7 +123,7 @@ export default class ForgeExtentionPreferences extends ExtensionPreferences {
 
     fillPreferencesWindow(window) {
         this.preferences = new Prefs(Keys, this.getSettings());
-        window.add(MainPage.fromPreferences(this.preferences));
+        window.add(MainPage.fromPreferences(this.preferences, this.path));
         window.search_enabled = true;
         window.set_default_size(720, 530);
     }
