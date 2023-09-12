@@ -124,11 +124,10 @@ class MainPage extends Adw.PreferencesPage {
 
 
 export default class ForgeExtentionPreferences extends ExtensionPreferences {
-    init() {
-        this.preferences = new Prefs(Keys, this.getSettings());
-    }
+    init() { }
 
     fillPreferencesWindow(window) {
+        this.preferences = new Prefs(Keys, this.getSettings());
         window.add(MainPage.fromPreferences(this.preferences));
         window.search_enabled = true;
         window.set_default_size(720, 530);
