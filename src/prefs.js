@@ -59,7 +59,7 @@ class MainPage extends Adw.PreferencesPage {
         }, this);
     }
 
-    constructor({ preferences }, props = {}) {
+    constructor(preferences, props = {}) {
         super(props);
 
         this.preferences = preferences;
@@ -99,11 +99,11 @@ class MainPage extends Adw.PreferencesPage {
 
 export default class ForgeExtentionPreferences extends ExtensionPreferences {
     init() {
-        this.preferences = new Prefs(Keys, this.getSettings());
     }
 
     fillPreferencesWindow(window) {
-        window.add(new MainPage(this));
+        const preferences = new Prefs(Keys, this.getSettings());
+        window.add(new MainPage(preferences));
         window.search_enabled = true;
         window.set_default_size(720, 530);
     }
