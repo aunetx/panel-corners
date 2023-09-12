@@ -8,7 +8,8 @@ import { ExtensionPreferences } from "resource:///org/gnome/Shell/Extensions/js/
 
 import { Prefs, Type } from './conveniences/settings.js';
 
-const Keys = [
+/** @type {import('./conveniences/settings.js').KeyType[]} */
+const Keys = ([
     { type: Type.B, name: "panel-corners" },
     { type: Type.I, name: "panel-corner-radius" },
     { type: Type.I, name: "panel-corner-border-width" },
@@ -22,7 +23,7 @@ const Keys = [
 
     { type: Type.B, name: "force-extension-values" },
     { type: Type.B, name: "debug" },
-];
+]);
 
 const parse_color_from_setting = function (setting, widget) {
     let color_string = setting.get();
@@ -59,10 +60,35 @@ class MainPage extends Adw.PreferencesPage {
         }, this);
     }
 
+    _panel_corners;
+    _panel_corner_color;
+    _panel_radius_adjustment;
+    _panel_opacity_adjustment;
+    _screen_corners;
+    _screen_corner_color;
+    _screen_radius_adjustment;
+    _screen_opacity_adjustment;
+    _force_extension_values;
+    _debug;
+;
     constructor(props = {}) {
         super(props);
+    }
 
-        this.preferences = props.preferences;
+    /**
+   * @param {Prefs} preferences
+   */
+    static fromPreferences(preferences) {
+        const page = new this();
+              page.#initPreferences(preferences);
+        return page;
+    }
+
+    /**
+     * @param {Prefs} preferences
+     */
+    #initPreferences(preferences) {
+        this.preferences = preferences;
 
         // Panel corners
         this.preferences.settings.bind('panel-corners', this._panel_corners, 'state', Gio.SettingsBindFlags.DEFAULT);
@@ -98,11 +124,12 @@ class MainPage extends Adw.PreferencesPage {
 
 
 export default class ForgeExtentionPreferences extends ExtensionPreferences {
-    init() {}
+    init() {
+        this.preferences = new Prefs(Keys, this.getSettings());
+    }
 
     fillPreferencesWindow(window) {
-        const preferences = new Prefs(Keys, this.getSettings());
-        window.add(new MainPage({ preferences }));
+        window.add(MainPage.fromPreferences(this.preferences));
         window.search_enabled = true;
         window.set_default_size(720, 530);
     }

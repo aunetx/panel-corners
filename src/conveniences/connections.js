@@ -1,6 +1,6 @@
 import GObject from 'gi://GObject';
 
-/** @typedef {import('@girs/gobject-2.0').GType & { connect: any; disconnect?: any; name?: string; }} Actor */
+/** @typedef {GObject.GType<unknown> & { connect: any; disconnect?: any; name?: string; }} Actor */
 
 /** object to easily manage signals. */
 export class Connections {
