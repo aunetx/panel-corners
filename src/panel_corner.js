@@ -1,6 +1,7 @@
 import Clutter from 'gi://Clutter';
 import St from 'gi://St'
 import GObject from 'gi://GObject';
+import Gio from 'gi://Gio';
 import Cairo from 'cairo';
 
 import * as Main from 'resource:///org/gnome/shell/ui/main.js';
@@ -66,11 +67,14 @@ export class PanelCorners {
         // update its style, showing it
         corner.vfunc_style_changed();
 
+        /** @type {import('./conveniences/connections.js').Actor} */
+        const actor = /** @type {any} */(this.#prefs.settings);
+
         // connect to each preference change from the extension, allowing the
         // corner to be updated when the user changes preferences
         this.#prefs.keys.forEach(key => {
             this.#connections.connect(
-                this.#prefs.settings,
+                actor,
                 'changed::' + key.name,
                 corner.vfunc_style_changed.bind(corner)
             );
@@ -103,7 +107,10 @@ export class PanelCorners {
         }
     }
 
-    /** Removes the given corner. */
+    /**
+     * Removes the given corner.
+     * @param {PanelCorner} corner
+     */
     remove_corner(corner) {
         // remove connections
         corner.remove_connections();
@@ -115,6 +122,9 @@ export class PanelCorners {
         corner.destroy();
     }
 
+    /**
+     * @param {any} str
+     */
     #log(str) {
         if (this.#prefs.DEBUG.get())
             console.log(`[Panel corners] ${str}`);
@@ -142,6 +152,10 @@ export class PanelCorner extends St.DrawingArea {
     );
 
 
+    /**
+     * @param {any} side
+     * @param {import("./conveniences/settings.js").Prefs} prefs
+     */
     constructor(side, prefs) {
         super({ style_class: 'panel-corner' });
 
@@ -253,6 +267,9 @@ export class PanelCorner extends St.DrawingArea {
         });
     }
 
+    /**
+     * @param {any} str
+     */
     #log(str) {
         if (this.#prefs.DEBUG.get())
             console.log(`[Panel corners] ${str}`);
