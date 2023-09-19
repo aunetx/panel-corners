@@ -16,7 +16,7 @@ class Pref {
     key;
 
     /** @type{number} */
-    #id
+    #id;
 
     /**
      * @param {import('@girs/gio-2.0').Settings} settings
@@ -32,7 +32,7 @@ class Pref {
      */
     changed(cb) {
         this.#id = this.settings.connect('changed::' + this.key, cb);
-        return this.#id
+        return this.#id;
     }
 
     /**
@@ -43,7 +43,7 @@ class Pref {
     }
 
     /** @return {T} */
-    get() { return }
+    get() { return; }
     /** @param {T} v */
     set(v) { }
 }
@@ -62,38 +62,38 @@ export class BooleanPref extends Pref {
 
 /** @extends {Pref<number>} */
 export class IntPref extends Pref {
-  get() {
-    return this.settings.get_int(this.key);
-  }
+    get() {
+        return this.settings.get_int(this.key);
+    }
 
-  /** @param {number} v */
-  set(v) {
-    this.settings.set_int(this.key, v);
-  }
+    /** @param {number} v */
+    set(v) {
+        this.settings.set_int(this.key, v);
+    }
 }
 
 /** @extends {Pref<number>} */
 export class DoublePref extends Pref {
-  get() {
-    return this.settings.get_double(this.key);
-  }
+    get() {
+        return this.settings.get_double(this.key);
+    }
 
-  /** @param {number} v */
-  set(v) {
-    this.settings.set_double(this.key, v);
-  }
+    /** @param {number} v */
+    set(v) {
+        this.settings.set_double(this.key, v);
+    }
 }
 
 /** @extends {Pref<string>} */
 export class StringPref extends Pref {
-  get() {
-    return this.settings.get_string(this.key);
-  }
+    get() {
+        return this.settings.get_string(this.key);
+    }
 
-  /** @param {string} v */
-  set(v) {
-    this.settings.set_string(this.key, v);
-  }
+    /** @param {string} v */
+    set(v) {
+        this.settings.set_string(this.key, v);
+    }
 }
 
 

@@ -1,7 +1,6 @@
-import Adw from 'gi://Adw';
-import Gtk from 'gi://Gtk?version=4.0';
-import GObject from 'gi://GObject';
-
+import Adw from "gi://Adw";
+import Gtk from "gi://Gtk?version=4.0";
+import GObject from "gi://GObject";
 
 export declare class Controls extends Adw.PreferencesPage {
   _panel_corners: Gtk.Switch;
@@ -15,4 +14,3 @@ export declare class Controls extends Adw.PreferencesPage {
   _force_extension_values: GObject.Object;
   _debug: GObject.Object;
 }
-

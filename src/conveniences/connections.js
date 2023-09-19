@@ -76,7 +76,7 @@ export class Connections {
             try {
                 connection.actor.disconnect(connection.id);
             } catch (e) {
-                this.#log(`error removing connection: ${e}; continuing`);
+                this.#warn(`error removing connection: ${e}; continuing`);
             }
 
             // remove from buffer
@@ -92,7 +92,7 @@ export class Connections {
             try {
                 connection.actor.disconnect(connection.id);
             } catch (e) {
-                this.#log(`error removing connection: ${e}; continuing`);
+                this.#warn(`error removing connection: ${e}; continuing`);
             }
         });
 
@@ -103,8 +103,7 @@ export class Connections {
     /**
      * @param {string} str
      */
-    #log(str) {
-        // no need to check if DEBUG here as this._log is only used on error
-        console.log(`[Panel corners] ${str}`);
+    #warn(str) {
+        console.warn(`[Panel corners] ${str}`);
     }
 }

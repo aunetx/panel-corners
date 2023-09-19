@@ -43,7 +43,7 @@ function parse_color_from_setting(setting, widget) {
     }
 };
 
-class MainPage extends /** @type {typeof import('./ui/main_page.d.ts').Controls} */(Adw.PreferencesPage) {
+class MainPage extends /** @type {typeof import('../resources/ui/main_page.d.ts').Controls} */(Adw.PreferencesPage) {
     static {
         GObject.registerClass({
             GTypeName: 'MainPage',
@@ -70,7 +70,7 @@ class MainPage extends /** @type {typeof import('./ui/main_page.d.ts').Controls}
      */
     static fromPreferences(preferences) {
         const page = new this();
-              page.#initPreferences(preferences);
+        page.#initPreferences(preferences);
         return page;
     }
 
@@ -84,10 +84,10 @@ class MainPage extends /** @type {typeof import('./ui/main_page.d.ts').Controls}
         this.preferences.settings.bind('panel-corners', this._panel_corners, 'state', Gio.SettingsBindFlags.DEFAULT);
         this.preferences.settings.bind('panel-corner-radius', this._panel_radius_adjustment, 'value', Gio.SettingsBindFlags.DEFAULT);
         this.preferences.settings.bind(
-          'panel-corner-opacity',
-          this._panel_opacity_adjustment,
-          'value',
-          Gio.SettingsBindFlags.DEFAULT,
+            'panel-corner-opacity',
+            this._panel_opacity_adjustment,
+            'value',
+            Gio.SettingsBindFlags.DEFAULT,
         );
         this.preferences.PANEL_CORNER_BACKGROUND_COLOR.changed(_ => {
             parse_color_from_setting(this.preferences.PANEL_CORNER_BACKGROUND_COLOR, this._panel_corner_color);

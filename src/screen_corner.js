@@ -1,6 +1,6 @@
 import Clutter from 'gi://Clutter';
-import St from 'gi://St'
-import Meta from 'gi://Meta'
+import St from 'gi://St';
+import Meta from 'gi://Meta';
 import GObject from 'gi://GObject';
 import Cairo from 'cairo';
 

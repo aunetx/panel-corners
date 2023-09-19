@@ -1,4 +1,4 @@
-import * as Main from 'resource:///org/gnome/shell/ui/main.js'
+import * as Main from 'resource:///org/gnome/shell/ui/main.js';
 import { Extension, gettext as _ } from 'resource:///org/gnome/shell/extensions/extension.js';
 
 import { Connections } from './conveniences/connections.js';
@@ -144,8 +144,8 @@ export default class PanelCornersExtension extends Extension {
      * them on extension disable.
      */
     remove() {
-      this.#panel_corners?.remove();
-      this.#screen_corners?.remove();
+        this.#panel_corners?.remove();
+        this.#screen_corners?.remove();
     }
 
     /** Disables the extension. */

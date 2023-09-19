@@ -1,7 +1,6 @@
 import Clutter from 'gi://Clutter';
-import St from 'gi://St'
+import St from 'gi://St';
 import GObject from 'gi://GObject';
-import Gio from 'gi://Gio';
 import Cairo from 'cairo';
 
 import * as Main from 'resource:///org/gnome/shell/ui/main.js';

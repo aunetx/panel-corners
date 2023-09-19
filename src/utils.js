@@ -1,5 +1,5 @@
 import Clutter from 'gi://Clutter';
-import St from 'gi://St'
+import St from 'gi://St';
 
 export function lookup_for_length(node, prop, prefs) {
     const use_extension_values = node && prefs.FORCE_EXTENSION_VALUES.get();
