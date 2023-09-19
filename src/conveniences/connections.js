@@ -1,22 +1,26 @@
-'use strict';
+import GObject from 'gi://GObject';
 
-const GObject = imports.gi.GObject;
+/** @typedef {GObject.GType<unknown> & { connect: any; disconnect?: any; name?: string; }} Actor */
 
-/// An object to easily manage signals.
-var Connections = class Connections {
+/** object to easily manage signals. */
+export class Connections {
     constructor() {
         this.buffer = [];
     }
 
-    /// Process the given actor and id.
-    ///
-    /// This makes sure that the signal is disconnected when the actor is
-    /// destroyed, and that the signal can be managed through other Connections
-    /// methods.
+    /**
+     * Process the given actor and id.
+     *
+     * This makes sure that the signal is disconnected when the actor is
+     * destroyed, and that the signal can be managed through other Connections
+     * methods.
+     * @param {Actor} actor
+     * @param {any} id
+     */
     process_connection(actor, id) {
         let infos = {
-            actor: actor,
-            id: id
+            actor,
+            id
         };
 
         // remove the signal when the actor is destroyed
@@ -41,19 +45,25 @@ var Connections = class Connections {
         this.buffer.push(infos);
     }
 
-    /// Adds a connection.
-    ///
-    /// Takes as arguments:
-    /// - an actor, which fires the signal
-    /// - a signal (string), which is watched for
-    /// - a callback, which is called when the signal is fired
+    /**
+     * Adds a connection.
+     *
+     * Takes as arguments:
+     *
+     * @param {Actor} actor - an actor, which fires the signal
+     * @param {any} signal - a signal (string), which is watched for
+     * @param {any} handler - a callback, which is called when the signal is fired
+     */
     connect(actor, signal, handler) {
         let id = actor.connect(signal, handler);
 
         this.process_connection(actor, id);
     }
 
-    /// Disconnects every connection found for an actor.
+    /**
+     * Disconnects every connection found for an actor.
+     * @param {Actor} actor
+     */
     disconnect_all_for(actor) {
         // get every connection stored for the actor
         let actor_connections = this.buffer.filter(
@@ -66,7 +76,7 @@ var Connections = class Connections {
             try {
                 connection.actor.disconnect(connection.id);
             } catch (e) {
-                this._log(`error removing connection: ${e}; continuing`);
+                this.#log(`error removing connection: ${e}; continuing`);
             }
 
             // remove from buffer
@@ -75,14 +85,14 @@ var Connections = class Connections {
         });
     }
 
-    /// Disconnect every connection for each actor.
+    /** Disconnect every connection for each actor. */
     disconnect_all() {
         this.buffer.forEach((connection) => {
             // disconnect
             try {
                 connection.actor.disconnect(connection.id);
             } catch (e) {
-                this._log(`error removing connection: ${e}; continuing`);
+                this.#log(`error removing connection: ${e}; continuing`);
             }
         });
 
@@ -90,8 +100,11 @@ var Connections = class Connections {
         this.buffer = [];
     }
 
-    _log(str) {
+    /**
+     * @param {string} str
+     */
+    #log(str) {
         // no need to check if DEBUG here as this._log is only used on error
-        log(`[Panel corners] ${str}`);
+        console.log(`[Panel corners] ${str}`);
     }
-};
+}
