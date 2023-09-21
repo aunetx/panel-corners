@@ -10,11 +10,11 @@ const SYNC_CREATE = GObject.BindingFlags.SYNC_CREATE;
 
 
 export class PanelCorners {
-    #prefs;
+    #settings;
     #connections;
 
-    constructor(prefs, connections) {
-        this.#prefs = prefs;
+    constructor(settings, connections) {
+        this.#settings = settings;
         this.#connections = connections;
     }
 
@@ -32,10 +32,10 @@ export class PanelCorners {
 
         // create each corner
         Main.panel._leftCorner = new PanelCorner(
-            St.Side.LEFT, this.#prefs
+            St.Side.LEFT, this.#settings
         );
         Main.panel._rightCorner = new PanelCorner(
-            St.Side.RIGHT, this.#prefs
+            St.Side.RIGHT, this.#settings
         );
 
         // update each of them
@@ -58,11 +58,11 @@ export class PanelCorners {
         // update its style, showing it
         corner.vfunc_style_changed();
 
-        const actor = (this.#prefs.settings);
+        const actor = (this.#settings.settings);
 
         // connect to each preference change from the extension, allowing the
         // corner to be updated when the user changes preferences
-        this.#prefs.keys.forEach(key => {
+        this.#settings.keys.forEach(key => {
             this.#connections.connect(
                 actor,
                 'changed::' + key.name,
@@ -112,7 +112,7 @@ export class PanelCorners {
     }
 
     #log(str) {
-        if (this.#prefs.DEBUG.get())
+        if (this.#settings.DEBUG.get())
             console.log(`[Panel corners] ${str}`);
     }
 }
@@ -124,8 +124,7 @@ export class PanelCorner extends St.DrawingArea {
     }
 
     #side;
-
-    #prefs;
+    #settings;
 
     #position_changed_id = Main.panel.connect(
         'notify::position',
@@ -138,11 +137,11 @@ export class PanelCorner extends St.DrawingArea {
     );
 
 
-    constructor(side, prefs) {
+    constructor(side, settings) {
         super({ style_class: 'panel-corner' });
 
         this.#side = side;
-        this.#prefs = prefs;
+        this.#settings = settings;
 
         this.#update_allocation();
     }
@@ -190,10 +189,10 @@ export class PanelCorner extends St.DrawingArea {
     vfunc_repaint() {
         let node = this.get_theme_node();
 
-        let cornerRadius = Utils.lookup_for_length(node, '-panel-corner-radius', this.#prefs);
-        let borderWidth = Utils.lookup_for_length(node, '-panel-corner-border-width', this.#prefs);
+        let cornerRadius = Utils.lookup_for_length(node, '-panel-corner-radius', this.#settings);
+        let borderWidth = Utils.lookup_for_length(node, '-panel-corner-border-width', this.#settings);
 
-        let backgroundColor = Utils.lookup_for_color(node, '-panel-corner-background-color', this.#prefs);
+        let backgroundColor = Utils.lookup_for_color(node, '-panel-corner-background-color', this.#settings);
 
         let cr = this.get_context();
         cr.setOperator(Cairo.Operator.SOURCE);
@@ -221,17 +220,17 @@ export class PanelCorner extends St.DrawingArea {
         super.vfunc_style_changed();
         let node = this.get_theme_node();
 
-        let cornerRadius = Utils.lookup_for_length(node, '-panel-corner-radius', this.#prefs);
-        let borderWidth = Utils.lookup_for_length(node, '-panel-corner-border-width', this.#prefs);
+        let cornerRadius = Utils.lookup_for_length(node, '-panel-corner-radius', this.#settings);
+        let borderWidth = Utils.lookup_for_length(node, '-panel-corner-border-width', this.#settings);
 
         const transitionDuration =
             node.get_transition_duration() / St.Settings.get().slow_down_factor;
 
-        let opacity = Utils.lookup_for_double(node, '-panel-corner-opacity', this.#prefs);
+        let opacity = Utils.lookup_for_double(node, '-panel-corner-opacity', this.#settings);
 
         // if using extension values and in overview, set transparent
         if (
-            this.#prefs.FORCE_EXTENSION_VALUES.get() &&
+            this.#settings.FORCE_EXTENSION_VALUES.get() &&
             Main.panel.get_style_pseudo_class() &&
             Main.panel.get_style_pseudo_class().includes('overview')
         )
@@ -250,7 +249,7 @@ export class PanelCorner extends St.DrawingArea {
     }
 
     #log(str) {
-        if (this.#prefs.DEBUG.get())
+        if (this.#settings.DEBUG.get())
             console.log(`[Panel corners] ${str}`);
     }
 }

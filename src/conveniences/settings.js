@@ -76,7 +76,7 @@ export class StringPref extends Pref {
  *
  * Should be initialized with an array of keys, for example:
  *
- * let prefs = new Prefs([
+ * let settings = new Settings([
  *     { type: Type.I, name: "panel-corner-radius" },
  *     { type: Type.B, name: "debug" }
  * ]);
@@ -84,7 +84,7 @@ export class StringPref extends Pref {
  * Each {type, name} object represents a gsettings key, which must be created
  * in the gschemas.xml file of the extension.
  */
-export class Prefs {
+export class Settings {
     constructor(keys, settings) {
         this.keys = keys;
         this.settings = settings;
@@ -114,7 +114,7 @@ export class Prefs {
 
     /**
      * From the gschema name, returns the name of the associated property on
-     * the Prefs object.
+     * the Settings object.
      */
     get_property_name(name) {
         return (
@@ -123,7 +123,7 @@ export class Prefs {
     }
 
     /**
-     * From the gschema name, returns the associated property on the Prefs
+     * From the gschema name, returns the associated property on the Settings
      * object.
      */
     get_property(name) {
@@ -131,8 +131,8 @@ export class Prefs {
     }
 
     /**
-     * Remove all connections managed by the Prefs object, i.e. created with
-     * `prefs.PROPERTY.changed(callback)`.
+     * Remove all connections managed by the Settings object, i.e. created with
+     * `settings.PROPERTY.changed(callback)`.
      */
     disconnect_all_settings() {
         this.keys.forEach(key => {

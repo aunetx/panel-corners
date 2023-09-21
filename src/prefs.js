@@ -7,7 +7,7 @@ import GObject from 'gi://GObject';
 
 import { ExtensionPreferences } from 'resource:///org/gnome/Shell/Extensions/js/extensions/prefs.js';
 
-import { Prefs, StringPref, Type } from './conveniences/settings.js';
+import { Settings, Type } from './conveniences/settings.js';
 
 const Keys = ([
     { type: Type.B, name: "panel-corners" },
@@ -116,7 +116,7 @@ export default class ForgeExtentionPreferences extends ExtensionPreferences {
      * returned by getPreferencesWidget().
      */
     fillPreferencesWindow(window) {
-        this.preferences = new Prefs(Keys, this.getSettings());
+        this.preferences = new Settings(Keys, this.getSettings());
         window.add(MainPage.fromPreferences(this.preferences, this.path));
         window.search_enabled = true;
         window.set_default_size(720, 530);

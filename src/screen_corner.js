@@ -14,11 +14,11 @@ const CornersList = [
 
 
 export class ScreenCorners {
-    #prefs;
+    #settings;
     #connections;
 
-    constructor(prefs, connections) {
-        this.#prefs = prefs;
+    constructor(settings, connections) {
+        this.#settings = settings;
         this.#connections = connections;
     }
 
@@ -39,7 +39,7 @@ export class ScreenCorners {
         for (let monitor of layoutManager.monitors) {
             for (let corner of CornersList) {
                 // create the new corner actor
-                var actor = new ScreenCorner(corner, monitor, this.#prefs);
+                var actor = new ScreenCorner(corner, monitor, this.#settings);
 
                 // insert it, shows the corner
                 layoutManager.addTopChrome(actor, { trackFullscreen: true });
@@ -50,9 +50,9 @@ export class ScreenCorners {
                 // connect to each preference change from the extension,
                 // allowing the corner to be updated when the user changes
                 // preferences
-                this.#prefs.keys.forEach(key => {
+                this.#settings.keys.forEach(key => {
                     this.#connections.connect(
-                        this.#prefs.settings,
+                        this.#settings.settings,
                         'changed::' + key.name,
                         actor.vfunc_style_changed.bind(actor)
                     );
@@ -82,7 +82,7 @@ export class ScreenCorners {
     }
 
     #log(str) {
-        if (this.#prefs.DEBUG.get())
+        if (this.#settings.DEBUG.get())
             console.log(`[Panel corners] ${str}`);
     }
 };
@@ -93,21 +93,21 @@ export class ScreenCorner extends St.DrawingArea {
     }
 
     #corner;
-    #prefs;
+    #settings;
     #monitor;
 
-    constructor(corner, monitor, prefs) {
+    constructor(corner, monitor, settings) {
         super({ style_class: 'screen-corner' });
 
         this.#corner = corner;
-        this.#prefs = prefs;
+        this.#settings = settings;
         this.#monitor = monitor;
 
         this.#update_allocation();
     }
 
     #update_allocation() {
-        let cornerRadius = Utils.lookup_for_length(null, '-screen-corner-radius', this.#prefs);
+        let cornerRadius = Utils.lookup_for_length(null, '-screen-corner-radius', this.#settings);
 
         switch (this.#corner) {
             case Meta.DisplayCorner.TOPLEFT:
@@ -141,8 +141,8 @@ export class ScreenCorner extends St.DrawingArea {
     }
 
     vfunc_repaint() {
-        let cornerRadius = Utils.lookup_for_length(null, '-screen-corner-radius', this.#prefs);
-        let backgroundColor = Utils.lookup_for_color(null, '-screen-corner-background-color', this.#prefs);
+        let cornerRadius = Utils.lookup_for_length(null, '-screen-corner-radius', this.#settings);
+        let backgroundColor = Utils.lookup_for_color(null, '-screen-corner-background-color', this.#settings);
 
         let cr = this.get_context();
         cr.setOperator(Cairo.Operator.SOURCE);
@@ -184,8 +184,8 @@ export class ScreenCorner extends St.DrawingArea {
     vfunc_style_changed() {
         super.vfunc_style_changed();
 
-        let cornerRadius = Utils.lookup_for_length(null, '-screen-corner-radius', this.#prefs);
-        let opacity = Utils.lookup_for_double(null, '-screen-corner-opacity', this.#prefs);
+        let cornerRadius = Utils.lookup_for_length(null, '-screen-corner-radius', this.#settings);
+        let opacity = Utils.lookup_for_double(null, '-screen-corner-opacity', this.#settings);
 
         this.set_opacity(opacity * 255);
         this.set_size(cornerRadius, cornerRadius);

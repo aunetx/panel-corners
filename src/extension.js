@@ -2,7 +2,7 @@ import * as Main from 'resource:///org/gnome/shell/ui/main.js';
 import { Extension, gettext as _ } from 'resource:///org/gnome/shell/extensions/extension.js';
 
 import { Connections } from './conveniences/connections.js';
-import { Prefs, Type } from './conveniences/settings.js';
+import { Settings, Type } from './conveniences/settings.js';
 
 import { PanelCorners } from './panel_corner.js';
 import { ScreenCorners } from './screen_corner.js';
@@ -25,14 +25,14 @@ const Keys = ([
 
 
 export default class PanelCornersExtension extends Extension {
-    #prefs;
+    #settings;
     #connections;
     #panel_corners;
     #screen_corners;
 
     /** Called on extension enable. */
     enable() {
-        this.#prefs = new Prefs(Keys, this.getSettings());
+        this.#settings = new Settings(Keys, this.getSettings());
         this.#connections = new Connections;
 
         this.#log("starting up...");
@@ -74,14 +74,14 @@ export default class PanelCornersExtension extends Extension {
 
         // create and update the panel corners manager if the preference is
         // changed
-        this.#prefs.PANEL_CORNERS.changed(() => {
+        this.#settings.PANEL_CORNERS.changed(() => {
             this.create_panel_corners();
             this.update();
         });
 
         // create and update the screen corners manager if the preference is
         // changed
-        this.#prefs.SCREEN_CORNERS.changed(() => {
+        this.#settings.SCREEN_CORNERS.changed(() => {
             this.create_screen_corners();
             this.update();
         });
@@ -98,9 +98,9 @@ export default class PanelCornersExtension extends Extension {
     create_panel_corners() {
         this.#panel_corners?.remove();
         this.#panel_corners &&= null;
-        if (this.#prefs.PANEL_CORNERS.get()) {
+        if (this.#settings.PANEL_CORNERS.get()) {
             this.#panel_corners = new PanelCorners(
-                this.#prefs, new Connections
+                this.#settings, new Connections
             );
         }
     }
@@ -113,9 +113,9 @@ export default class PanelCornersExtension extends Extension {
     create_screen_corners() {
         this.#screen_corners?.remove();
         this.#screen_corners &&= null;
-        if (this.#prefs.SCREEN_CORNERS.get()) {
+        if (this.#settings.SCREEN_CORNERS.get()) {
             this.#screen_corners = new ScreenCorners(
-                this.#prefs, new Connections
+                this.#settings, new Connections
             );
         }
     }
@@ -148,11 +148,11 @@ export default class PanelCornersExtension extends Extension {
         this.#panel_corners = null;
         this.#screen_corners = null;
         this.#connections = null;
-        this.#prefs = null;
+        this.#settings = null;
     }
 
     #log(str) {
-        if (this.#prefs.DEBUG.get())
+        if (this.#settings.DEBUG.get())
             console.log(`[Panel corners] ${str}`);
     }
 }
