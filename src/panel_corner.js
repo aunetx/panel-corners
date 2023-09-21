@@ -10,16 +10,9 @@ const SYNC_CREATE = GObject.BindingFlags.SYNC_CREATE;
 
 
 export class PanelCorners {
-    /** @type {import('./conveniences/settings.js').Prefs} */
     #prefs;
-
-    /** @type {import('./conveniences/connections.js').Connections} */
     #connections;
 
-    /**
-     * @param {import('./conveniences/settings.js').Prefs} prefs
-     * @param {import("./conveniences/connections.js").Connections} connections
-     */
     constructor(prefs, connections) {
         this.#prefs = prefs;
         this.#connections = connections;
@@ -54,7 +47,6 @@ export class PanelCorners {
 
     /**
      * Updates the given corner.
-     * @param {PanelCorner} corner
      */
     update_corner(corner) {
         // bind corner style to the panel style
@@ -66,8 +58,7 @@ export class PanelCorners {
         // update its style, showing it
         corner.vfunc_style_changed();
 
-        /** @type {import('./conveniences/connections.js').Actor} */
-        const actor = /** @type {any} */(this.#prefs.settings);
+        const actor = (this.#prefs.settings);
 
         // connect to each preference change from the extension, allowing the
         // corner to be updated when the user changes preferences
@@ -108,7 +99,6 @@ export class PanelCorners {
 
     /**
      * Removes the given corner.
-     * @param {PanelCorner} corner
      */
     remove_corner(corner) {
         // remove connections
@@ -121,9 +111,6 @@ export class PanelCorners {
         corner.destroy();
     }
 
-    /**
-     * @param {any} str
-     */
     #log(str) {
         if (this.#prefs.DEBUG.get())
             console.log(`[Panel corners] ${str}`);
@@ -151,10 +138,6 @@ export class PanelCorner extends St.DrawingArea {
     );
 
 
-    /**
-     * @param {any} side
-     * @param {import("./conveniences/settings.js").Prefs} prefs
-     */
     constructor(side, prefs) {
         super({ style_class: 'panel-corner' });
 
@@ -266,9 +249,6 @@ export class PanelCorner extends St.DrawingArea {
         });
     }
 
-    /**
-     * @param {any} str
-     */
     #log(str) {
         if (this.#prefs.DEBUG.get())
             console.log(`[Panel corners] ${str}`);

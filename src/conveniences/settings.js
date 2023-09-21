@@ -1,96 +1,70 @@
 /**
  * An enum non-extensively describing the type of a gsettings key.
  */
-export const Type = /** @type {const} */({
+export const Type = ({
     B: 'Boolean',
     I: 'Integer',
     D: 'Double',
     S: 'String'
 });
 
-/**
- * @template T
- */
 class Pref {
-    /** @type{string} */
     key;
-
-    /** @type{number} */
     #id;
 
-    /**
-     * @param {import('@girs/gio-2.0').Settings} settings
-     * @param {import('./types.d.ts').KeyType} key
-     */
     constructor(settings, key) {
         this.key = key.name;
         this.settings = settings;
     }
 
-    /**
-     * @param {(...args: any[]) => unknown} cb
-     */
     changed(cb) {
         this.#id = this.settings.connect('changed::' + this.key, cb);
         return this.#id;
     }
 
-    /**
-     * @param {number} [id = this.#id]
-     */
     disconnect(id = this.#id) {
         return this.settings.disconnect(id);
     }
 
-    /** @return {T} */
     get() { return; }
-    /** @param {T} v */
     set(v) { }
 }
 
-/** @extends {Pref<boolean>} */
 export class BooleanPref extends Pref {
     get() {
         return this.settings.get_boolean(this.key);
     }
 
-    /** @param {boolean} v */
     set(v) {
         this.settings.set_boolean(this.key, v);
     }
 }
 
-/** @extends {Pref<number>} */
 export class IntPref extends Pref {
     get() {
         return this.settings.get_int(this.key);
     }
 
-    /** @param {number} v */
     set(v) {
         this.settings.set_int(this.key, v);
     }
 }
 
-/** @extends {Pref<number>} */
 export class DoublePref extends Pref {
     get() {
         return this.settings.get_double(this.key);
     }
 
-    /** @param {number} v */
     set(v) {
         this.settings.set_double(this.key, v);
     }
 }
 
-/** @extends {Pref<string>} */
 export class StringPref extends Pref {
     get() {
         return this.settings.get_string(this.key);
     }
 
-    /** @param {string} v */
     set(v) {
         this.settings.set_string(this.key, v);
     }
@@ -111,23 +85,6 @@ export class StringPref extends Pref {
  * in the gschemas.xml file of the extension.
  */
 export class Prefs {
-    /** @type {Pref} */ PANEL_CORNERS;
-    /** @type {Pref} */ SCREEN_CORNERS;
-    /** @type {Pref} */ DEBUG;
-    /** @type {Pref} */ FORCE_EXTENSION_VALUES;
-
-    /** @type {Pref} */ PANEL_CORNER_RADIUS;
-    /** @type {Pref} */ PANEL_CORNER_BORDER_WIDTH;
-    /** @type {Pref} */ PANEL_CORNER_BACKGROUND_COLOR;
-    /** @type {Pref} */ PANEL_CORNER_OPACITY;
-    /** @type {Pref} */ SCREEN_CORNER_RADIUS;
-    /** @type {Pref} */ SCREEN_CORNER_BACKGROUND_COLOR;
-    /** @type {Pref} */ SCREEN_CORNER_OPACITY;
-
-    /**
-     * @param {import('./types.d.ts').KeyType[]} keys
-     * @param {import('@girs/gio-2.0').Settings} settings
-     */
     constructor(keys, settings) {
         this.keys = keys;
         this.settings = settings;
@@ -158,11 +115,9 @@ export class Prefs {
     /**
      * From the gschema name, returns the name of the associated property on
      * the Prefs object.
-     * @param {string} name
-     * @return {import('./types.d.ts').PrefsKey}
      */
     get_property_name(name) {
-        return /** @type{import('./types.d.ts').PrefsKey} */(
+        return (
             name.replaceAll('-', '_').toUpperCase()
         );
     }
@@ -170,7 +125,6 @@ export class Prefs {
     /**
      * From the gschema name, returns the associated property on the Prefs
      * object.
-     * @param {string} name
      */
     get_property(name) {
         return this[this.get_property_name(name)];

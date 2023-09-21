@@ -15,7 +15,6 @@ const CornersList = [
 
 export class ScreenCorners {
     #prefs;
-
     #connections;
 
     constructor(prefs, connections) {
@@ -82,9 +81,6 @@ export class ScreenCorners {
         layoutManager._screenCorners = [];
     }
 
-    /**
-     * @param {string} str
-     */
     #log(str) {
         if (this.#prefs.DEBUG.get())
             console.log(`[Panel corners] ${str}`);
@@ -97,9 +93,7 @@ export class ScreenCorner extends St.DrawingArea {
     }
 
     #corner;
-
     #prefs;
-
     #monitor;
 
     constructor(corner, monitor, prefs) {

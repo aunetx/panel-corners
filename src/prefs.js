@@ -1,6 +1,6 @@
 import Adw from 'gi://Adw';
-import Gdk from 'gi://Gdk?version=4.0';
-import Gtk from 'gi://Gtk?version=4.0';
+import Gdk from 'gi://Gdk';
+import Gtk from 'gi://Gtk';
 import GLib from 'gi://GLib';
 import Gio from 'gi://Gio';
 import GObject from 'gi://GObject';
@@ -9,7 +9,6 @@ import { ExtensionPreferences } from 'resource:///org/gnome/Shell/Extensions/js/
 
 import { Prefs, StringPref, Type } from './conveniences/settings.js';
 
-/** @type {import('./conveniences/settings.js').KeyType[]} */
 const Keys = ([
     { type: Type.B, name: "panel-corners" },
     { type: Type.I, name: "panel-corner-radius" },
@@ -26,10 +25,6 @@ const Keys = ([
     { type: Type.B, name: "debug" },
 ]);
 
-/**
- * @param {StringPref} setting
- * @param {Gtk.ColorDialogButton} widget
- */
 function parse_color_from_setting(setting, widget) {
     let color_string = setting.get();
     let color_parsed = new Gdk.RGBA;
@@ -43,7 +38,7 @@ function parse_color_from_setting(setting, widget) {
     }
 };
 
-class MainPage extends /** @type {typeof import('../resources/ui/main_page.d.ts').Controls} */(Adw.PreferencesPage) {
+class MainPage extends (Adw.PreferencesPage) {
     static {
         GObject.registerClass({
             GTypeName: 'MainPage',
@@ -65,18 +60,12 @@ class MainPage extends /** @type {typeof import('../resources/ui/main_page.d.ts'
         }, this);
     }
 
-    /**
-     * @param {Prefs} preferences
-     */
     static fromPreferences(preferences) {
         const page = new this();
         page.#initPreferences(preferences);
         return page;
     }
 
-    /**
-     * @param {Prefs} preferences
-     */
     #initPreferences(preferences) {
         this.preferences = preferences;
 
@@ -125,8 +114,6 @@ export default class ForgeExtentionPreferences extends ExtensionPreferences {
      *
      * The default implementation adds the widget
      * returned by getPreferencesWidget().
-     *
-     * @param {Adw.PreferencesWindow} window - the preferences window
      */
     fillPreferencesWindow(window) {
         this.preferences = new Prefs(Keys, this.getSettings());

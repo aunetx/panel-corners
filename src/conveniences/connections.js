@@ -1,7 +1,5 @@
 import GObject from 'gi://GObject';
 
-/** @typedef {GObject.GType<unknown> & { connect: any; disconnect?: any; name?: string; }} Actor */
-
 /** object to easily manage signals. */
 export class Connections {
     constructor() {
@@ -14,8 +12,6 @@ export class Connections {
      * This makes sure that the signal is disconnected when the actor is
      * destroyed, and that the signal can be managed through other Connections
      * methods.
-     * @param {Actor} actor
-     * @param {any} id
      */
     process_connection(actor, id) {
         let infos = {
@@ -49,10 +45,9 @@ export class Connections {
      * Adds a connection.
      *
      * Takes as arguments:
-     *
-     * @param {Actor} actor - an actor, which fires the signal
-     * @param {any} signal - a signal (string), which is watched for
-     * @param {any} handler - a callback, which is called when the signal is fired
+     * - an actor, which fires the signal
+     * - a signal (string), which is watched for
+     * - a callback, which is called when the signal is fired
      */
     connect(actor, signal, handler) {
         let id = actor.connect(signal, handler);
@@ -62,7 +57,6 @@ export class Connections {
 
     /**
      * Disconnects every connection found for an actor.
-     * @param {Actor} actor
      */
     disconnect_all_for(actor) {
         // get every connection stored for the actor
@@ -100,9 +94,6 @@ export class Connections {
         this.buffer = [];
     }
 
-    /**
-     * @param {string} str
-     */
     #warn(str) {
         console.warn(`[Panel corners] ${str}`);
     }
