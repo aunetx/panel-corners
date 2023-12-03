@@ -12,7 +12,7 @@ If your theme supports panel corners but you want to customize them anyway, you 
 
 A very big part of the code is directly ported from the [official GNOME shell repository](https://gitlab.gnome.org/GNOME/gnome-shell), so the immense majority of the work was done by various gnome contributors. All this extension does is integrate the previous code as an extension, provide some configuration options and make all of this compatible for GNOME 42 and later.
 
-The bottom corners code is directly ported from [this merge request by Alexander Mikhaylenko](https://gitlab.gnome.org/GNOME/gnome-shell/-/merge_requests/1328) to have roundness on every corner of every screen.
+The bottom corners code is directly ported from [this merge request by Alice Mikhaylenko](https://gitlab.gnome.org/GNOME/gnome-shell/-/merge_requests/1328) to have roundness on every corner of every screen.
 
 ## Installation
 

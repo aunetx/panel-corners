@@ -1,12 +1,11 @@
-'use strict';
+import Clutter from 'gi://Clutter';
+import St from 'gi://St';
+import Meta from 'gi://Meta';
+import GObject from 'gi://GObject';
+import Cairo from 'cairo';
 
-const { Clutter, GObject, Meta, St } = imports.gi;
-const Cairo = imports.cairo;
-const Main = imports.ui.main;
-const Layout = imports.ui.layout;
-
-const Me = imports.misc.extensionUtils.getCurrentExtension();
-const Utils = Me.imports.utils;
+import * as Main from 'resource:///org/gnome/shell/ui/main.js';
+import * as Utils from './utils.js';
 
 const CornersList = [
     Meta.DisplayCorner.TOPLEFT, Meta.DisplayCorner.TOPRIGHT,
@@ -14,17 +13,22 @@ const CornersList = [
 ];
 
 
-var ScreenCorners = class ScreenCorners {
-    constructor(prefs, connections) {
-        this._prefs = prefs;
-        this._connections = connections;
+export class ScreenCorners {
+    #settings;
+    #connections;
+
+    constructor(settings, connections) {
+        this.#settings = settings;
+        this.#connections = connections;
     }
 
-    /// Updates the corners.
-    ///
-    /// This removes already existing screen corners, and create new ones.
+    /**
+     * Updates the corners.
+     *
+     * This removes already existing screen corners, and create new ones.
+     */
     update() {
-        this._log("updating screen corners...");
+        this.#log("updating screen corners...");
 
         let layoutManager = Main.layoutManager;
 
@@ -35,7 +39,7 @@ var ScreenCorners = class ScreenCorners {
         for (let monitor of layoutManager.monitors) {
             for (let corner of CornersList) {
                 // create the new corner actor
-                var actor = new ScreenCorner(corner, monitor, this._prefs);
+                var actor = new ScreenCorner(corner, monitor, this.#settings);
 
                 // insert it, shows the corner
                 layoutManager.addTopChrome(actor, { trackFullscreen: true });
@@ -46,22 +50,22 @@ var ScreenCorners = class ScreenCorners {
                 // connect to each preference change from the extension,
                 // allowing the corner to be updated when the user changes
                 // preferences
-                this._prefs.keys.forEach(key => {
-                    this._connections.connect(
-                        this._prefs.settings,
+                this.#settings.keys.forEach(key => {
+                    this.#connections.connect(
+                        this.#settings.settings,
                         'changed::' + key.name,
                         actor.vfunc_style_changed.bind(actor)
                     );
                 });
             }
         }
-        this._log("corners updated.");
+        this.#log("corners updated.");
     }
 
-    /// Removes existing corners.
+    /** Removes existing corners. */
     remove() {
         // disconnect every signal created by the extension
-        this._connections.disconnect_all();
+        this.#connections.disconnect_all();
 
         let layoutManager = Main.layoutManager;
 
@@ -77,109 +81,114 @@ var ScreenCorners = class ScreenCorners {
         layoutManager._screenCorners = [];
     }
 
-    _log(str) {
-        if (this._prefs.DEBUG.get())
-            log(`[Panel corners] ${str}`);
+    #log(str) {
+        if (this.#settings.DEBUG.get())
+            console.log(`[Panel corners] ${str}`);
     }
 };
 
+export class ScreenCorner extends St.DrawingArea {
+    static {
+        GObject.registerClass(this);
+    }
 
-let ScreenCorner = GObject.registerClass(
-    class ScreenCorner extends St.DrawingArea {
-        _init(corner, monitor, prefs) {
-            super._init({ style_class: 'screen-corner' });
+    #corner;
+    #settings;
+    #monitor;
 
-            this._corner = corner;
-            this._prefs = prefs;
-            this._monitor = monitor;
+    constructor(corner, monitor, settings) {
+        super({ style_class: 'screen-corner' });
 
-            this._update_allocation();
-        }
+        this.#corner = corner;
+        this.#settings = settings;
+        this.#monitor = monitor;
 
-        _update_allocation() {
-            let cornerRadius = Utils.lookup_for_length(null, '-screen-corner-radius', this._prefs);
+        this.#update_allocation();
+    }
 
-            switch (this._corner) {
-                case Meta.DisplayCorner.TOPLEFT:
-                    this.set_position(
-                        this._monitor.x,
-                        this._monitor.y
-                    );
-                    break;
+    #update_allocation() {
+        let cornerRadius = Utils.lookup_for_length(null, '-screen-corner-radius', this.#settings);
 
-                case Meta.DisplayCorner.TOPRIGHT:
-                    this.set_position(
-                        this._monitor.x + this._monitor.width - cornerRadius,
-                        this._monitor.y
-                    );
-                    break;
+        switch (this.#corner) {
+            case Meta.DisplayCorner.TOPLEFT:
+                this.set_position(
+                    this.#monitor.x,
+                    this.#monitor.y
+                );
+                break;
 
-                case Meta.DisplayCorner.BOTTOMLEFT:
-                    this.set_position(
-                        this._monitor.x,
-                        this._monitor.y + this._monitor.height - cornerRadius
-                    );
-                    break;
+            case Meta.DisplayCorner.TOPRIGHT:
+                this.set_position(
+                    this.#monitor.x + this.#monitor.width - cornerRadius,
+                    this.#monitor.y
+                );
+                break;
 
-                case Meta.DisplayCorner.BOTTOMRIGHT:
-                    this.set_position(
-                        this._monitor.x + this._monitor.width - cornerRadius,
-                        this._monitor.y + this._monitor.height - cornerRadius
-                    );
-                    break;
-            }
-        }
+            case Meta.DisplayCorner.BOTTOMLEFT:
+                this.set_position(
+                    this.#monitor.x,
+                    this.#monitor.y + this.#monitor.height - cornerRadius
+                );
+                break;
 
-        vfunc_repaint() {
-            let cornerRadius = Utils.lookup_for_length(null, '-screen-corner-radius', this._prefs);
-            let backgroundColor = Utils.lookup_for_color(null, '-screen-corner-background-color', this._prefs);
-
-            let cr = this.get_context();
-            cr.setOperator(Cairo.Operator.SOURCE);
-
-            switch (this._corner) {
-                case Meta.DisplayCorner.TOPLEFT:
-                    cr.arc(cornerRadius, cornerRadius,
-                        cornerRadius, Math.PI, 3 * Math.PI / 2);
-                    cr.lineTo(0, 0);
-                    break;
-
-                case Meta.DisplayCorner.TOPRIGHT:
-                    cr.arc(0, cornerRadius,
-                        cornerRadius, 3 * Math.PI / 2, 2 * Math.PI);
-                    cr.lineTo(cornerRadius, 0);
-                    break;
-
-                case Meta.DisplayCorner.BOTTOMLEFT:
-                    cr.arc(cornerRadius, 0,
-                        cornerRadius, Math.PI / 2, Math.PI);
-                    cr.lineTo(0, cornerRadius);
-                    break;
-
-                case Meta.DisplayCorner.BOTTOMRIGHT:
-                    cr.arc(0, 0,
-                        cornerRadius, 0, Math.PI / 2);
-                    cr.lineTo(cornerRadius, cornerRadius);
-                    break;
-            }
-
-            cr.closePath();
-
-            Clutter.cairo_set_source_color(cr, backgroundColor);
-            cr.fill();
-
-            cr.$dispose();
-        }
-
-        vfunc_style_changed() {
-            super.vfunc_style_changed();
-
-            let cornerRadius = Utils.lookup_for_length(null, '-screen-corner-radius', this._prefs);
-            let opacity = Utils.lookup_for_double(null, '-screen-corner-opacity', this._prefs);
-
-            this.set_opacity(opacity * 255);
-            this.set_size(cornerRadius, cornerRadius);
-            this._update_allocation();
+            case Meta.DisplayCorner.BOTTOMRIGHT:
+                this.set_position(
+                    this.#monitor.x + this.#monitor.width - cornerRadius,
+                    this.#monitor.y + this.#monitor.height - cornerRadius
+                );
+                break;
         }
     }
-);
+
+    vfunc_repaint() {
+        let cornerRadius = Utils.lookup_for_length(null, '-screen-corner-radius', this.#settings);
+        let backgroundColor = Utils.lookup_for_color(null, '-screen-corner-background-color', this.#settings);
+
+        let cr = this.get_context();
+        cr.setOperator(Cairo.Operator.SOURCE);
+
+        switch (this.#corner) {
+            case Meta.DisplayCorner.TOPLEFT:
+                cr.arc(cornerRadius, cornerRadius,
+                    cornerRadius, Math.PI, 3 * Math.PI / 2);
+                cr.lineTo(0, 0);
+                break;
+
+            case Meta.DisplayCorner.TOPRIGHT:
+                cr.arc(0, cornerRadius,
+                    cornerRadius, 3 * Math.PI / 2, 2 * Math.PI);
+                cr.lineTo(cornerRadius, 0);
+                break;
+
+            case Meta.DisplayCorner.BOTTOMLEFT:
+                cr.arc(cornerRadius, 0,
+                    cornerRadius, Math.PI / 2, Math.PI);
+                cr.lineTo(0, cornerRadius);
+                break;
+
+            case Meta.DisplayCorner.BOTTOMRIGHT:
+                cr.arc(0, 0,
+                    cornerRadius, 0, Math.PI / 2);
+                cr.lineTo(cornerRadius, cornerRadius);
+                break;
+        }
+
+        cr.closePath();
+
+        Clutter.cairo_set_source_color(cr, backgroundColor);
+        cr.fill();
+
+        cr.$dispose();
+    }
+
+    vfunc_style_changed() {
+        super.vfunc_style_changed();
+
+        let cornerRadius = Utils.lookup_for_length(null, '-screen-corner-radius', this.#settings);
+        let opacity = Utils.lookup_for_double(null, '-screen-corner-opacity', this.#settings);
+
+        this.set_opacity(opacity * 255);
+        this.set_size(cornerRadius, cornerRadius);
+        this.#update_allocation();
+    }
+}

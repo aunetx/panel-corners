@@ -1,21 +1,13 @@
-'use strict';
+import * as Main from 'resource:///org/gnome/shell/ui/main.js';
+import { Extension, gettext as _ } from 'resource:///org/gnome/shell/extensions/extension.js';
 
-const { St, Meta } = imports.gi;
-const Main = imports.ui.main;
-const Config = imports.misc.config;
-const ExtensionUtils = imports.misc.extensionUtils;
+import { Connections } from './conveniences/connections.js';
+import { Settings, Type } from './conveniences/settings.js';
 
-const Me = ExtensionUtils.getCurrentExtension();
+import { PanelCorners } from './panel_corner.js';
+import { ScreenCorners } from './screen_corner.js';
 
-const { Connections } = Me.imports.conveniences.connections;
-const { Prefs, Type } = Me.imports.conveniences.settings;
-
-const { PanelCorners } = Me.imports.panel_corner;
-const { ScreenCorners } = Me.imports.screen_corner;
-
-const [GS_MAJOR, GS_MINOR] = Config.PACKAGE_VERSION.split('.');
-
-const Keys = [
+const Keys = ([
     { type: Type.B, name: "panel-corners" },
     { type: Type.I, name: "panel-corner-radius" },
     { type: Type.I, name: "panel-corner-border-width" },
@@ -29,34 +21,37 @@ const Keys = [
 
     { type: Type.B, name: "force-extension-values" },
     { type: Type.B, name: "debug" },
-];
+]);
 
 
-class Extension {
-    constructor() { }
+export default class PanelCornersExtension extends Extension {
+    #settings;
+    #connections;
+    #panel_corners;
+    #screen_corners;
 
-    /// Called on extension enable.
+    /** Called on extension enable. */
     enable() {
-        this._prefs = new Prefs(Keys);
-        this._connections = new Connections;
+        this.#settings = new Settings(Keys, this.getSettings());
+        this.#connections = new Connections;
 
-        this._log("starting up...");
+        this.#log("starting up...");
 
-        this._connections.connect(
+        this.#connections.connect(
             Main.layoutManager,
             'monitors-changed',
-            _ => this.update()
+            () => this.update()
         );
 
-        this._connections.connect(
+        this.#connections.connect(
             global.display,
             'workareas-changed',
-            _ => this.update()
+            () => this.update()
         );
 
         // load the extension when the shell has finished starting up
         if (Main.layoutManager._startingUp)
-            this._connections.connect(
+            this.#connections.connect(
                 Main.layoutManager,
                 'startup-complete',
                 this.load.bind(this)
@@ -65,9 +60,11 @@ class Extension {
             this.load();
     }
 
-    /// Called when the shell has finished starting up.
-    ///
-    /// It create our new corners.
+    /**
+     * Called when the shell has finished starting up.
+     *
+     * It create our new corners.
+     */
     load() {
         // create the panel corners manager
         this.create_panel_corners();
@@ -77,14 +74,14 @@ class Extension {
 
         // create and update the panel corners manager if the preference is
         // changed
-        this._prefs.PANEL_CORNERS.changed(_ => {
+        this.#settings.PANEL_CORNERS.changed(() => {
             this.create_panel_corners();
             this.update();
         });
 
         // create and update the screen corners manager if the preference is
         // changed
-        this._prefs.SCREEN_CORNERS.changed(_ => {
+        this.#settings.SCREEN_CORNERS.changed(() => {
             this.create_screen_corners();
             this.update();
         });
@@ -93,88 +90,69 @@ class Extension {
         this.update();
     }
 
-    /// Creates the panel corners manager if needed.
-    ///
-    /// If panel corners are deactivated, the existing corners are destroyed.
+    /**
+     * Creates the panel corners manager if needed.
+     *
+     * If panel corners are deactivated, the existing corners are destroyed.
+     */
     create_panel_corners() {
-        if (this._panel_corners) {
-            this._panel_corners.remove();
-            delete this._panel_corners;
-        }
-
-        if (this._prefs.PANEL_CORNERS.get()) {
-            this._panel_corners = new PanelCorners(
-                this._prefs, new Connections
+        this.#panel_corners?.remove();
+        this.#panel_corners &&= null;
+        if (this.#settings.PANEL_CORNERS.get()) {
+            this.#panel_corners = new PanelCorners(
+                this.#settings, new Connections
             );
         }
     }
 
-    /// Creates the screen corners manager if needed.
-    ///
-    /// If screen corners are deactivated, the existing corners are destroyed.
+    /**
+     * Creates the screen corners manager if needed.
+     *
+     * If screen corners are deactivated, the existing corners are destroyed.
+     */
     create_screen_corners() {
-        if (this._screen_corners) {
-            this._screen_corners.remove();
-            delete this._screen_corners;
-        }
-
-        if (this._prefs.SCREEN_CORNERS.get()) {
-            this._screen_corners = new ScreenCorners(
-                this._prefs, new Connections
+        this.#screen_corners?.remove();
+        this.#screen_corners &&= null;
+        if (this.#settings.SCREEN_CORNERS.get()) {
+            this.#screen_corners = new ScreenCorners(
+                this.#settings, new Connections
             );
         }
     }
 
-    /// Updates the corners.
+    /** Updates the corners. */
     update() {
-        this._log("updating corners...");
-
-        if (this._panel_corners)
-            this._panel_corners.update();
-
-        if (this._screen_corners)
-            this._screen_corners.update();
-
-        this._log("corners updated.");
+        this.#log("updating corners...");
+        this.#panel_corners?.update();
+        this.#screen_corners?.update();
+        this.#log("corners updated.");
     }
 
-    /// Removes existing corners.
-    ///
-    /// It is meant to destroy entirely old corners, except if they were saved
-    /// by the extension on load; in which case it keep them intact to restore
-    /// them on extension disable.
+    /**
+     * Removes existing corners.
+     *
+     * It is meant to destroy entirely old corners, except if they were saved
+     * by the extension on load; in which case it keep them intact to restore
+     * them on extension disable.
+     */
     remove() {
-        if (this._panel_corners)
-            this._panel_corners.remove();
-
-        if (this._screen_corners)
-            this._screen_corners.remove();
+        this.#panel_corners?.remove();
+        this.#screen_corners?.remove();
     }
 
-    /// Disables the extension.
+    /** Disables the extension. */
     disable() {
         this.remove();
-
-        this._connections.disconnect_all();
-
-        this._log("extension disabled.");
-
-        if (this._panel_corners)
-            delete this._panel_corners;
-
-        if (this._screen_corners)
-            delete this._screen_corners;
-
-        delete this._connections;
-        delete this._prefs;
+        this.#connections.disconnect_all();
+        this.#log("extension disabled.");
+        this.#panel_corners = null;
+        this.#screen_corners = null;
+        this.#connections = null;
+        this.#settings = null;
     }
 
-    _log(str) {
-        if (this._prefs.DEBUG.get())
-            log(`[Panel corners] ${str}`);
+    #log(str) {
+        if (this.#settings.DEBUG.get())
+            console.log(`[Panel corners] ${str}`);
     }
 }
-
-function init() {
-    return new Extension();
-};
