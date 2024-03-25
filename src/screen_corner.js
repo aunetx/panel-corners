@@ -175,7 +175,7 @@ export class ScreenCorner extends St.DrawingArea {
 
         cr.closePath();
 
-        Clutter.cairo_set_source_color(cr, backgroundColor);
+        cr.setSourceColor(backgroundColor);
         cr.fill();
 
         cr.$dispose();
