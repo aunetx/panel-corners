@@ -5,9 +5,9 @@ import Cairo from 'cairo';
 
 import * as Main from 'resource:///org/gnome/shell/ui/main.js';
 import * as Utils from './utils.js';
+import { ANIMATION_TIME } from 'resource:///org/gnome/shell/ui/overview.js';
 
 const SYNC_CREATE = GObject.BindingFlags.SYNC_CREATE;
-
 
 export class PanelCorners {
     #settings;
@@ -223,9 +223,6 @@ export class PanelCorner extends St.DrawingArea {
         let cornerRadius = Utils.lookup_for_length(node, '-panel-corner-radius', this.#settings);
         let borderWidth = Utils.lookup_for_length(node, '-panel-corner-border-width', this.#settings);
 
-        const transitionDuration =
-            node.get_transition_duration() / St.Settings.get().slow_down_factor;
-
         let opacity = Utils.lookup_for_double(node, '-panel-corner-opacity', this.#settings);
 
         // if using extension values and in overview, set transparent
@@ -243,7 +240,7 @@ export class PanelCorner extends St.DrawingArea {
         this.remove_transition('opacity');
         this.ease({
             opacity: opacity * 255,
-            duration: transitionDuration,
+            duration: ANIMATION_TIME,
             mode: Clutter.AnimationMode.EASE_IN_OUT_QUAD,
         });
     }
