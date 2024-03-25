@@ -5,7 +5,8 @@
   "uuid": "panel-corners@aunetx",
   "settings-schema": "org.gnome.shell.extensions.panel-corners",
   "shell-version": [
-    "45"
+    "45",
+    "46"
   ],
-  "version": 9
+  "version": 10
 }
