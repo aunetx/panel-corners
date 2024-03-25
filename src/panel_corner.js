@@ -210,7 +210,7 @@ export class PanelCorner extends St.DrawingArea {
         cr.lineTo(cornerRadius, 0);
         cr.closePath();
 
-        Clutter.cairo_set_source_color(cr, backgroundColor);
+        cr.setSourceColor(backgroundColor);
         cr.fill();
 
         cr.$dispose();
