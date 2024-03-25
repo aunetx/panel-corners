@@ -106,7 +106,7 @@ class MainPage extends (Adw.PreferencesPage) {
     }
 }
 
-export default class ForgeExtentionPreferences extends ExtensionPreferences {
+export default class PanelCornersPreferences extends ExtensionPreferences {
     init() { }
 
     /**
