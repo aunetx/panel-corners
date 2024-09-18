@@ -1,5 +1,6 @@
 import Clutter from 'gi://Clutter';
 import St from 'gi://St';
+import Cogl from 'gi://Cogl';
 
 export function lookup_for_length(node, prop, settings) {
     const use_extension_values = node && settings.FORCE_EXTENSION_VALUES.get();
@@ -42,7 +43,9 @@ export function lookup_for_color(node, prop, settings) {
 
     if (use_extension_values || !lookup[0]) {
         let color_str = settings.get_property(prop.slice(1)).get();
-        let color_parsed = Clutter.color_from_string(color_str);
+        let color_parsed = Clutter.Color ?
+            Clutter.color_from_string(color_str) :
+            Cogl.color_from_string(color_str);
 
         if (color_parsed[0]) {
             return color_parsed[1];
@@ -50,7 +53,9 @@ export function lookup_for_color(node, prop, settings) {
             // could not parse color, defaulting to black
             settings.get_property(prop.slice(1)).set('#000000ff');
 
-            return Clutter.color_from_string('#000000ff')[1];
+            return Clutter.Color ?
+                Clutter.color_from_string('#000000ff')[1] :
+                Cogl.color_from_string('#000000ff')[1];
         }
     } else {
         return lookup[1];
