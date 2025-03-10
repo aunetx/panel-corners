@@ -6,7 +6,8 @@
   "settings-schema": "org.gnome.shell.extensions.panel-corners",
   "shell-version": [
     "46",
-    "47"
+    "47",
+    "48"
   ],
   "version": 13
 }
