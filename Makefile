@@ -14,6 +14,7 @@ build: clean
 			--extra-source=./utils.js \
 			--extra-source=./panel_corner.js \
 			--extra-source=./screen_corner.js \
+			--podir=../po \
 			--schema=../schemas/org.gnome.shell.extensions.$(NAME).gschema.xml \
 			-o ../build
 
