@@ -1,0 +1,78 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the panel-corners@aunetx package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: panel-corners@aunetx\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-03-10 23:16+0100\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: resources/ui/main_page.ui:5
+msgid "Main page"
+msgstr ""
+
+#: resources/ui/main_page.ui:9
+msgid "Panel corners"
+msgstr ""
+
+#: resources/ui/main_page.ui:18 resources/ui/main_page.ui:81
+msgid "Radius"
+msgstr ""
+
+#: resources/ui/main_page.ui:19 resources/ui/main_page.ui:82
+msgid "Recommended size is 12 px, to integrate with applications."
+msgstr ""
+
+#: resources/ui/main_page.ui:35 resources/ui/main_page.ui:98
+msgid "Color"
+msgstr ""
+
+#: resources/ui/main_page.ui:36 resources/ui/main_page.ui:99
+msgid "Changes the color of corners, black is recommended."
+msgstr ""
+
+#: resources/ui/main_page.ui:52 resources/ui/main_page.ui:115
+msgid "Opacity"
+msgstr ""
+
+#: resources/ui/main_page.ui:53 resources/ui/main_page.ui:116
+msgid "Defines the corner opacity."
+msgstr ""
+
+#: resources/ui/main_page.ui:72
+msgid "Screen corners"
+msgstr ""
+
+#: resources/ui/main_page.ui:135
+msgid "Advanced"
+msgstr ""
+
+#: resources/ui/main_page.ui:139
+msgid "Force extension values"
+msgstr ""
+
+#: resources/ui/main_page.ui:140
+msgid ""
+"Allows you to override the current theme-defined corner preference, if the "
+"theme sets one."
+msgstr ""
+
+#: resources/ui/main_page.ui:152
+msgid "Debug"
+msgstr ""
+
+#: resources/ui/main_page.ui:153
+msgid ""
+"Makes the extension verbose in logs, activate when you need to report an "
+"issue."
+msgstr ""

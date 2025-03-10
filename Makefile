@@ -22,6 +22,24 @@ install: build remove
 	gnome-extensions install -f build/$(UUID).shell-extension.zip
 
 
+pot:
+	find resources/ui -iname "*.ui" -printf "%p\n" | sort | \
+		xargs xgettext --output=po/$(UUID).pot --from-code=utf-8 --package-name=$(UUID)
+
+	rm po/LINGUAS
+	for l in $$(ls po/*.po); do \
+		basename $$l .po >> po/LINGUAS; \
+	done
+
+	cd po && \
+	for lang in $$(cat LINGUAS); do \
+    	mv $${lang}.po $${lang}.po.old; \
+    	msginit --no-translator --locale=$$lang --input $(UUID).pot -o $${lang}.po.new; \
+    	msgmerge -N $${lang}.po.old $${lang}.po.new > $${lang}.po; \
+    	rm $${lang}.po.old $${lang}.po.new; \
+	done
+
+
 test-prefs: install
 	gnome-extensions prefs $(UUID)
 
