@@ -50,12 +50,12 @@ You can see available preferences in `schemas/org.gnome.shell.extensions.panel-c
 
 This extension was created for GNOME 42 and later, but was backward-compatible. Last versions are not, because they only are compatibility updates.
 
-Supported GNOME shell versions are:
-
-- GNOME shell 46 : up to version 10
-- GNOME shell 45 : up to version 9 and version 11
-- GNOME shell 42, 43, 44 : up to version 7
-- GNOME shell 40, 41 : up to version 3
+| GNOME shell version | Extension version |
+| ------------------- | ----------------- |
+| 46, 47, 48, 49, 50  | 15                |
+| 45                  | 11                |
+| 42, 43, 44          | 7                 |
+| 40, 41              | 3                 |
 
 ## License
 
