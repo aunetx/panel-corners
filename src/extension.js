@@ -13,6 +13,7 @@ const Keys = ([
     { type: Type.I, name: "panel-corner-border-width" },
     { type: Type.S, name: "panel-corner-background-color" },
     { type: Type.D, name: "panel-corner-opacity" },
+    { type: Type.S, name: "panel-corner-position" },
 
     { type: Type.B, name: "screen-corners" },
     { type: Type.I, name: "screen-corner-radius" },
