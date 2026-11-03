@@ -2,6 +2,33 @@ import Clutter from 'gi://Clutter';
 import St from 'gi://St';
 import Cogl from 'gi://Cogl';
 
+import * as Main from 'resource:///org/gnome/shell/ui/main.js';
+
+/**
+ * Returns the edge of the screen the panel is on, `St.Side.TOP` or
+ * `St.Side.BOTTOM`. With the `auto` position, it is guessed from where the
+ * panel box is on the primary monitor, so it follows the panel when another
+ * extension moves it (the translation used to hide the panel is ignored).
+ */
+export function get_panel_side(settings) {
+    switch (settings.PANEL_CORNER_POSITION.get()) {
+        case 'top':
+            return St.Side.TOP;
+        case 'bottom':
+            return St.Side.BOTTOM;
+    }
+
+    const monitor = Main.layoutManager.primaryMonitor;
+    if (!monitor)
+        return St.Side.TOP;
+
+    const panel_box = Main.layoutManager.panelBox;
+    const panel_center = panel_box.y + panel_box.height / 2;
+
+    return panel_center > monitor.y + monitor.height / 2 ?
+        St.Side.BOTTOM : St.Side.TOP;
+}
+
 export function lookup_for_length(node, prop, settings) {
     const use_extension_values = node && settings.FORCE_EXTENSION_VALUES.get();
 

@@ -37,6 +37,18 @@
             <description />
         </key>
 
+        <!-- PANEL CORNER POSITION -->
+        <key type="s" name="panel-corner-position">
+            <choices>
+                <choice value="auto" />
+                <choice value="top" />
+                <choice value="bottom" />
+            </choices>
+            <default>"auto"</default>
+            <summary>Side of the panel the corners are attached to</summary>
+            <description>"auto" follows the panel wherever it is, for example when another extension moves it to the bottom of the screen; "top" draws the corners under a top panel; "bottom" draws them above a bottom panel.</description>
+        </key>
+
         <!-- SCREEN CORNERS -->
         <key type="b" name="screen-corners">
             <default>true</default>

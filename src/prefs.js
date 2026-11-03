@@ -15,6 +15,7 @@ const Keys = ([
     { type: Type.I, name: "panel-corner-border-width" },
     { type: Type.S, name: "panel-corner-background-color" },
     { type: Type.D, name: "panel-corner-opacity" },
+    { type: Type.S, name: "panel-corner-position" },
 
     { type: Type.B, name: "screen-corners" },
     { type: Type.I, name: "screen-corner-radius" },
@@ -24,6 +25,9 @@ const Keys = ([
     { type: Type.B, name: "force-extension-values" },
     { type: Type.B, name: "debug" },
 ]);
+
+// values of the `panel-corner-position` key, in the order of the combo row
+const PANEL_CORNER_POSITIONS = ['auto', 'top', 'bottom'];
 
 function parse_color_from_setting(setting, widget) {
     let color_string = setting.get();
@@ -48,6 +52,7 @@ class MainPage extends (Adw.PreferencesPage) {
                 'panel_corner_color',
                 'panel_radius_adjustment',
                 'panel_opacity_adjustment',
+                'panel_corner_position',
 
                 'screen_corners',
                 'screen_corner_color',
@@ -86,6 +91,20 @@ class MainPage extends (Adw.PreferencesPage) {
             this.preferences.PANEL_CORNER_BACKGROUND_COLOR.set(color);
         });
         parse_color_from_setting(this.preferences.PANEL_CORNER_BACKGROUND_COLOR, this._panel_corner_color);
+
+        // the position is a string key shown as a combo row, so keep both in
+        // sync by hand
+        const sync_position_row = () => {
+            const index = PANEL_CORNER_POSITIONS.indexOf(this.preferences.PANEL_CORNER_POSITION.get());
+            this._panel_corner_position.selected = Math.max(index, 0);
+        };
+        this.preferences.PANEL_CORNER_POSITION.changed(sync_position_row);
+        this._panel_corner_position.connect('notify::selected', row => {
+            const position = PANEL_CORNER_POSITIONS[row.selected] ?? 'auto';
+            if (this.preferences.PANEL_CORNER_POSITION.get() !== position)
+                this.preferences.PANEL_CORNER_POSITION.set(position);
+        });
+        sync_position_row();
 
         // Screen corners
         this.preferences.settings.bind('screen-corners', this._screen_corners, 'state', Gio.SettingsBindFlags.DEFAULT);

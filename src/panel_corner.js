@@ -136,6 +136,18 @@ export class PanelCorner extends St.DrawingArea {
         this.#update_allocation.bind(this)
     );
 
+    // edge of the screen the panel is on, TOP or BOTTOM
+    #panel_side = St.Side.TOP;
+
+    // the panel box moves when another extension puts the panel at the bottom
+    // of the screen (or back at the top)
+    #panel_box_changed_id = Main.layoutManager.panelBox.connect(
+        'notify::allocation',
+        () => {
+            if (Utils.get_panel_side(this.#settings) !== this.#panel_side)
+                this.vfunc_style_changed();
+        }
+    );
 
     constructor(side, settings) {
         super({ style_class: 'panel-corner' });
@@ -155,6 +167,10 @@ export class PanelCorner extends St.DrawingArea {
             Main.panel.disconnect(this.#size_changed_id);
             this.#size_changed_id = null;
         }
+        if (this.#panel_box_changed_id) {
+            Main.layoutManager.panelBox.disconnect(this.#panel_box_changed_id);
+            this.#panel_box_changed_id = null;
+        }
     }
 
     #update_allocation() {
@@ -167,19 +183,23 @@ export class PanelCorner extends St.DrawingArea {
         let allocWidth = Main.panel.width;
         let allocHeight = Main.panel.height;
 
+        // under a top panel, above a bottom one
+        let cornerY = this.#panel_side === St.Side.BOTTOM ?
+            -cornerHeight : allocHeight;
+
         switch (this.#side) {
             case St.Side.LEFT:
                 childBox.x1 = 0;
                 childBox.x2 = cornerWidth;
-                childBox.y1 = allocHeight;
-                childBox.y2 = allocHeight + cornerHeight;
+                childBox.y1 = cornerY;
+                childBox.y2 = cornerY + cornerHeight;
                 break;
 
             case St.Side.RIGHT:
                 childBox.x1 = allocWidth - cornerWidth;
                 childBox.x2 = allocWidth;
-                childBox.y1 = allocHeight;
-                childBox.y2 = allocHeight + cornerHeight;
+                childBox.y1 = cornerY;
+                childBox.y2 = cornerY + cornerHeight;
                 break;
         }
 
@@ -196,6 +216,12 @@ export class PanelCorner extends St.DrawingArea {
 
         let cr = this.get_context();
         cr.setOperator(Cairo.Operator.SOURCE);
+
+        // above a bottom panel, draw the same shape upside down
+        if (this.#panel_side === St.Side.BOTTOM) {
+            cr.translate(0, borderWidth + cornerRadius);
+            cr.scale(1, -1);
+        }
 
         cr.moveTo(0, 0);
         if (this.#side == St.Side.LEFT) {
@@ -233,9 +259,14 @@ export class PanelCorner extends St.DrawingArea {
         )
             opacity = 0.;
 
-        this.#update_allocation();
+        // the position above a bottom panel depends on the corner height, so
+        // the size must be set before allocating
+        this.#panel_side = Utils.get_panel_side(this.#settings);
         this.set_size(cornerRadius, borderWidth + cornerRadius);
-        this.translation_y = -borderWidth;
+        this.#update_allocation();
+        this.translation_y = this.#panel_side === St.Side.BOTTOM ?
+            borderWidth : -borderWidth;
+        this.queue_repaint();
 
         this.remove_transition('opacity');
         this.ease({

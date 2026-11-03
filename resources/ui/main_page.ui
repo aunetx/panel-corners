@@ -64,6 +64,23 @@
             </child>
           </object>
         </child>
+
+        <child>
+          <object class="AdwComboRow" id="panel_corner_position">
+            <property name="title" translatable="yes">Position</property>
+            <property name="subtitle" translatable="yes">Edge of the screen the panel is on. Automatic follows the panel, even if another extension moves it.</property>
+            <property name="sensitive" bind-source="panel_corners" bind-property="state" bind-flags="sync-create" />
+            <property name="model">
+              <object class="GtkStringList">
+                <items>
+                  <item translatable="yes">Automatic</item>
+                  <item translatable="yes">Top</item>
+                  <item translatable="yes">Bottom</item>
+                </items>
+              </object>
+            </property>
+          </object>
+        </child>
       </object>
     </child>
 
